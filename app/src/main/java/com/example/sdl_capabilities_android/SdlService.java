@@ -11,11 +11,13 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
+import com.smartdevicelink.managers.AlertCompletionListener;
 import com.smartdevicelink.managers.CompletionListener;
 import com.smartdevicelink.managers.SdlManager;
 import com.smartdevicelink.managers.SdlManagerListener;
 import com.smartdevicelink.managers.file.filetypes.SdlArtwork;
 import com.smartdevicelink.managers.lifecycle.LifecycleConfigurationUpdate;
+import com.smartdevicelink.managers.screen.AlertView;
 import com.smartdevicelink.managers.screen.SoftButtonObject;
 import com.smartdevicelink.managers.screen.SoftButtonState;
 import com.smartdevicelink.managers.screen.choiceset.ChoiceCell;
@@ -41,6 +43,7 @@ import com.smartdevicelink.proxy.rpc.enums.StaticIconName;
 import com.smartdevicelink.proxy.rpc.enums.TriggerSource;
 import com.smartdevicelink.proxy.rpc.listeners.OnRPCNotificationListener;
 import com.smartdevicelink.transport.TCPTransportConfig;
+import com.smartdevicelink.util.DebugTool;
 import com.smartdevicelink.util.SystemInfo;
 
 import java.util.ArrayList;
@@ -54,7 +57,7 @@ public class SdlService extends Service {
 
     private static final String APP_NAME = "SDL";
     private static final String APP_ID = "8678309";
-    private static final int TCP_PORT = 13764;
+    private static final int TCP_PORT = 13863;
     private static final String DEV_MACHINE_IP_ADDRESS = "m.sdl.tools";
 
     private SdlManager sdlManager = null;
@@ -213,30 +216,14 @@ public class SdlService extends Service {
          mainCell1 = new MenuCell("Main Screen Text Fields", "Secondary Text", null, null, null, null, new MenuSelectionListener() {
             @Override
             public void onTriggered(TriggerSource trigger) {
-                sdlManager.getScreenManager().beginTransaction();
-                sdlManager.getScreenManager().setTextField1("1. There are up to four available text fields ");
-                sdlManager.getScreenManager().setTextField2("2. That can be displayed on screen,");
-                sdlManager.getScreenManager().setTextField3("3. Depending on the screen layout selected");
-                sdlManager.getScreenManager().setTextField4("4. Text field 4");
-                sdlManager.getScreenManager().setTitle("Title Field");
-                sdlManager.getScreenManager().setPrimaryGraphic(null);
-                sdlManager.getScreenManager().commit(null);
-                updateMenu(true);
-
+                setMainScreenTextFields();
             }
         });
 
          mainCell2 = new MenuCell("Set Screen Images", null, null, null, null, null, new MenuSelectionListener() {
             @Override
             public void onTriggered(TriggerSource trigger) {
-                TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.DOUBLE_GRAPHIC_WITH_SOFTBUTTONS.toString());
-                sdlManager.getScreenManager().beginTransaction();
-                sdlManager.getScreenManager().changeLayout(templateConfiguration, null);
-                sdlManager.getScreenManager().setPrimaryGraphic(artwork1);
-                sdlManager.getScreenManager().setSecondaryGraphic(artwork2);
-                sdlManager.getScreenManager().commit(null);
-                updateMenu(true);
-
+                setScreenImages();
             }
         });
 
@@ -252,7 +239,7 @@ public class SdlService extends Service {
         mainCell4 = new MenuCell("Alert", null, null, null, null, null, new MenuSelectionListener() {
             @Override
             public void onTriggered(TriggerSource trigger) {
-
+                setAlert();
             }
         });
 
@@ -289,6 +276,7 @@ public class SdlService extends Service {
         mainCell7 = new MenuCell("Slider", null, null, null,null, null, new MenuSelectionListener() {
             @Override
             public void onTriggered(TriggerSource trigger) {
+                setSlider();
             }
 
         });
@@ -311,11 +299,10 @@ public class SdlService extends Service {
 
     }
     private void updateMenu(boolean mainScreenBack) {
+        // if not on Home screen, have a back to main screen button
         if (mainScreenBack) {
-            // Send the entire menu off to be created
             sdlManager.getScreenManager().setMenu(Arrays.asList(mainCellBack, mainCell1, mainCell2, mainCell3, mainCell4, mainCell5, mainCell6, mainCell7, mainCell8, mainCell9));
         } else {
-            // Send the entire menu off to be created
             sdlManager.getScreenManager().setMenu(Arrays.asList(mainCell1, mainCell2, mainCell3, mainCell4, mainCell5, mainCell6, mainCell7, mainCell8, mainCell9));
         }
     }
@@ -350,6 +337,187 @@ public class SdlService extends Service {
                 }
             });
             sdlManager.getScreenManager().presentChoiceSet(choiceSet, InteractionMode.MANUAL_ONLY);
+        }
+    }
+
+    private void setSlider() {
+
+
+    }
+
+    private void setMainScreenTextFields() {
+        sdlManager.getScreenManager().beginTransaction();
+        sdlManager.getScreenManager().setTextField1("1. There are up to four available text fields ");
+        sdlManager.getScreenManager().setTextField2("2. That can be displayed on screen,");
+        sdlManager.getScreenManager().setTextField3("3. Depending on the screen layout selected");
+        sdlManager.getScreenManager().setTextField4("4. Text field 4");
+        sdlManager.getScreenManager().setTitle("Title Field");
+        sdlManager.getScreenManager().setPrimaryGraphic(null);
+        sdlManager.getScreenManager().commit(null);
+        updateMenu(true);
+    }
+
+    private void setScreenImages() {
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.DOUBLE_GRAPHIC_WITH_SOFTBUTTONS.toString());
+
+        sdlManager.getScreenManager().beginTransaction();
+        sdlManager.getScreenManager().changeLayout(templateConfiguration, null);
+        sdlManager.getScreenManager().setPrimaryGraphic(artwork1);
+        sdlManager.getScreenManager().setSecondaryGraphic(artwork2);
+        sdlManager.getScreenManager().setSoftButtonObjects(Collections.EMPTY_LIST);
+        sdlManager.getScreenManager().commit(null);
+        updateMenu(true);
+    }
+
+    private void setAlert() {
+        SoftButtonState softButtonState = new SoftButtonState("State1", "Alert ", null);
+        SoftButtonState softButtonState2 = new SoftButtonState("State2", "Alert with Buttons", null);
+        SoftButtonState softButtonState3 = new SoftButtonState("State3", "Subtle Alert", null);
+        SoftButtonState softButtonState4 = new SoftButtonState("State4", "Subtle Alert with Buttons", null);
+
+        SoftButtonObject softButtonObject = new SoftButtonObject("Button1", softButtonState, new SoftButtonObject.OnEventListener() {
+            @Override
+            public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+                AlertView.Builder alertBuilder = new AlertView.Builder();
+                alertBuilder.setIcon(artwork1);
+                alertBuilder.setText("Alert TextField 1");
+                alertBuilder.setSecondaryText("Alert TextField 2");
+                alertBuilder.setTertiaryText("Alert TextField 3");
+                AlertView alertView = alertBuilder.build();
+                sdlManager.getScreenManager().presentAlert(alertView, new AlertCompletionListener() {
+                    @Override
+                    public void onComplete(boolean success, Integer tryAgainTime) {
+
+                    }
+                });
+
+            }
+
+            @Override
+            public void onEvent(SoftButtonObject softButtonObject, OnButtonEvent onButtonEvent) {
+
+            }
+        });
+
+        SoftButtonObject softButtonObject2 = new SoftButtonObject("Button2", softButtonState2, new SoftButtonObject.OnEventListener() {
+            @Override
+            public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+                SoftButtonState softButtonStateYes = new SoftButtonState("yesState", "Yes", null);
+                SoftButtonState softButtonStateNo = new SoftButtonState("noState", "No", null);
+                SoftButtonObject yesButton = new SoftButtonObject("yesButton", softButtonStateYes, new SoftButtonObject.OnEventListener() {
+                    @Override
+                    public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+                        sdlManager.getScreenManager().setTextField2("Yes button pressed");
+                    }
+
+                    @Override
+                    public void onEvent(SoftButtonObject softButtonObject, OnButtonEvent onButtonEvent) {
+
+                    }
+                });
+
+                SoftButtonObject noButton = new SoftButtonObject("noButton", softButtonStateNo, new SoftButtonObject.OnEventListener() {
+                    @Override
+                    public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+
+                    }
+
+                    @Override
+                    public void onEvent(SoftButtonObject softButtonObject, OnButtonEvent onButtonEvent) {
+
+                    }
+                });
+                List<SoftButtonObject> softButtonObjectList = Arrays.asList(yesButton, noButton);
+
+                AlertView.Builder alertBuilder = new AlertView.Builder();
+                alertBuilder.setIcon(artwork1);
+                alertBuilder.setText("Alert with Buttons");
+                alertBuilder.setSoftButtons(softButtonObjectList);
+                AlertView alertView = alertBuilder.build();
+                sdlManager.getScreenManager().presentAlert(alertView, new AlertCompletionListener() {
+                    @Override
+                    public void onComplete(boolean success, Integer tryAgainTime) {
+
+                    }
+                });
+
+            }
+
+            @Override
+            public void onEvent(SoftButtonObject softButtonObject, OnButtonEvent onButtonEvent) {
+
+            }
+
+        });
+
+        SoftButtonObject softButtonObject3 = new SoftButtonObject("Button3", softButtonState3, new SoftButtonObject.OnEventListener() {
+            @Override
+            public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+
+            }
+
+            @Override
+            public void onEvent(SoftButtonObject softButtonObject, OnButtonEvent onButtonEvent) {
+
+            }
+        });
+
+        SoftButtonObject softButtonObject4 = new SoftButtonObject("Button4", softButtonState4, new SoftButtonObject.OnEventListener() {
+            @Override
+            public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+
+            }
+
+            @Override
+            public void onEvent(SoftButtonObject softButtonObject, OnButtonEvent onButtonEvent) {
+
+            }
+        });
+        List<SoftButtonObject> softButtonObjectList = Arrays.asList(softButtonObject, softButtonObject2, softButtonObject3, softButtonObject4);
+
+
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.NON_MEDIA.toString());
+
+        updateMenu(true);
+        updateScreen("Click on a button below to see an example of an Alert", null, null, null, "AlertScreen", softButtonObjectList, templateConfiguration );
+
+    }
+
+    private void updateScreen(String textField1, String textField2, String textField3, String textField4, String titleField, List<SoftButtonObject> softButtonObjectList, TemplateConfiguration templateConfiguration) {
+        DebugTool.logInfo("Julian", "updateScreen");
+        if (templateConfiguration == null) {
+            sdlManager.getScreenManager().beginTransaction();
+            sdlManager.getScreenManager().setTextField1(textField1);
+            sdlManager.getScreenManager().setTextField2(textField2);
+            sdlManager.getScreenManager().setTextField2(textField3);
+            sdlManager.getScreenManager().setTextField2(textField4);
+            sdlManager.getScreenManager().setTitle(titleField);
+            sdlManager.getScreenManager().setSoftButtonObjects(softButtonObjectList);
+            sdlManager.getScreenManager().commit(new CompletionListener() {
+                @Override
+                public void onComplete(boolean success) {
+                }
+            });
+        } else {
+            sdlManager.getScreenManager().beginTransaction();
+            sdlManager.getScreenManager().changeLayout(templateConfiguration, null);
+            sdlManager.getScreenManager().commit(new CompletionListener() {
+                @Override
+                public void onComplete(boolean success) {
+                    sdlManager.getScreenManager().beginTransaction();
+                    sdlManager.getScreenManager().setTextField1(textField1);
+                    sdlManager.getScreenManager().setTextField2(textField2);
+                    sdlManager.getScreenManager().setTextField2(textField3);
+                    sdlManager.getScreenManager().setTextField2(textField4);
+                    sdlManager.getScreenManager().setTitle(titleField);
+                    sdlManager.getScreenManager().setSoftButtonObjects(softButtonObjectList);
+                    sdlManager.getScreenManager().commit(new CompletionListener() {
+                        @Override
+                        public void onComplete(boolean success) {
+                        }
+                    });
+                }
+            });
         }
     }
 }
