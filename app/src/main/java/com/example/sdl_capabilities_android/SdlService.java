@@ -27,9 +27,17 @@ import com.smartdevicelink.managers.screen.menu.MenuCell;
 import com.smartdevicelink.managers.screen.menu.MenuSelectionListener;
 import com.smartdevicelink.protocol.enums.FunctionID;
 import com.smartdevicelink.proxy.RPCNotification;
+import com.smartdevicelink.proxy.RPCResponse;
 import com.smartdevicelink.proxy.rpc.OnButtonEvent;
 import com.smartdevicelink.proxy.rpc.OnButtonPress;
 import com.smartdevicelink.proxy.rpc.OnHMIStatus;
+import com.smartdevicelink.proxy.rpc.RGBColor;
+import com.smartdevicelink.proxy.rpc.ScrollableMessage;
+import com.smartdevicelink.proxy.rpc.Slider;
+import com.smartdevicelink.proxy.rpc.SliderResponse;
+import com.smartdevicelink.proxy.rpc.SoftButton;
+import com.smartdevicelink.proxy.rpc.SubtleAlert;
+import com.smartdevicelink.proxy.rpc.TemplateColorScheme;
 import com.smartdevicelink.proxy.rpc.TemplateConfiguration;
 import com.smartdevicelink.proxy.rpc.enums.AppHMIType;
 import com.smartdevicelink.proxy.rpc.enums.FileType;
@@ -39,9 +47,11 @@ import com.smartdevicelink.proxy.rpc.enums.Language;
 import com.smartdevicelink.proxy.rpc.enums.MenuLayout;
 import com.smartdevicelink.proxy.rpc.enums.PredefinedLayout;
 import com.smartdevicelink.proxy.rpc.enums.PredefinedWindows;
+import com.smartdevicelink.proxy.rpc.enums.SoftButtonType;
 import com.smartdevicelink.proxy.rpc.enums.StaticIconName;
 import com.smartdevicelink.proxy.rpc.enums.TriggerSource;
 import com.smartdevicelink.proxy.rpc.listeners.OnRPCNotificationListener;
+import com.smartdevicelink.proxy.rpc.listeners.OnRPCResponseListener;
 import com.smartdevicelink.transport.TCPTransportConfig;
 import com.smartdevicelink.util.DebugTool;
 import com.smartdevicelink.util.SystemInfo;
@@ -168,35 +178,10 @@ public class SdlService extends Service {
 
     private void setMainScreen () {
         TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.TEXT_WITH_GRAPHIC.toString());
-
-        sdlManager.getScreenManager().beginTransaction();
-        sdlManager.getScreenManager().changeLayout(templateConfiguration, null);
-        sdlManager.getScreenManager().setTextField1("Welcome to SDL");
-        sdlManager.getScreenManager().setTextField2("Open Menu to explore SDL capabilities");
-        sdlManager.getScreenManager().setTextField3(null);
-        sdlManager.getScreenManager().setTextField4(null);
-        sdlManager.getScreenManager().setPrimaryGraphic(artwork1);
-        sdlManager.getScreenManager().commit(new CompletionListener() {
-            @Override
-            public void onComplete(boolean success) {
-
-            }
-        });
+        updateScreen("Welcome to SDL", "Open Menu to explore SDL capabilities", null, null, null, null, templateConfiguration, artwork1, null);
         setMenu();
-        SoftButtonState backToMainScreenState = new SoftButtonState("MainScreen", null, new SdlArtwork(StaticIconName.BACK));
-        backToMainScreen = new SoftButtonObject("BackToMainScreen", backToMainScreenState, new SoftButtonObject.OnEventListener() {
-            @Override
-            public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
-                setMainScreen();
-            }
-
-            @Override
-            public void onEvent(SoftButtonObject softButtonObject, OnButtonEvent onButtonEvent) {
-
-            }
-        });
     }
-    MenuCell mainCellBack, mainCell1, mainCell2, mainCell3, mainCell4, mainCell5, mainCell6, mainCell7, mainCell8, mainCell9;
+    MenuCell mainCellBack, mainCell1, mainCell2, mainCell3, mainCell4, mainCell5, mainCell6, mainCell7, mainCell8, mainCell9, mainCell10;
 
     private void setMenu () {
 
@@ -269,6 +254,7 @@ public class SdlService extends Service {
          mainCell6 = new MenuCell("On Screen Buttons", null, null, null,null, null, new MenuSelectionListener() {
             @Override
             public void onTriggered(TriggerSource trigger) {
+                setOnScreenButtons();
             }
 
         });
@@ -284,6 +270,7 @@ public class SdlService extends Service {
         mainCell8 = new MenuCell("Scrollable Message", null, null, null,null, null, new MenuSelectionListener() {
             @Override
             public void onTriggered(TriggerSource trigger) {
+                setScrollableMessage();
             }
 
         });
@@ -294,6 +281,22 @@ public class SdlService extends Service {
             }
 
         });
+        MenuCell sub10Cell1 = new MenuCell("Fake Uber", null, null, null, null, null, new MenuSelectionListener() {
+            @Override
+            public void onTriggered(TriggerSource trigger) {
+                setBlackAndWhiteDesign();
+
+            }
+        });
+
+        MenuCell sub10Cell2 = new MenuCell("Need a Lyft", null, null, null, null, null, new MenuSelectionListener() {
+            @Override
+            public void onTriggered(TriggerSource trigger) {
+                setPinkAndWhiteDesign();
+            }
+        });
+        mainCell10 = new MenuCell("Color Scheme Branding Examples", null, null, MenuLayout.LIST, livio, null, Arrays.asList(sub10Cell1, sub10Cell2));
+
 
         updateMenu(false);
 
@@ -301,9 +304,9 @@ public class SdlService extends Service {
     private void updateMenu(boolean mainScreenBack) {
         // if not on Home screen, have a back to main screen button
         if (mainScreenBack) {
-            sdlManager.getScreenManager().setMenu(Arrays.asList(mainCellBack, mainCell1, mainCell2, mainCell3, mainCell4, mainCell5, mainCell6, mainCell7, mainCell8, mainCell9));
+            sdlManager.getScreenManager().setMenu(Arrays.asList(mainCellBack, mainCell1, mainCell2, mainCell3, mainCell4, mainCell5, mainCell6, mainCell7, mainCell8, mainCell9, mainCell10));
         } else {
-            sdlManager.getScreenManager().setMenu(Arrays.asList(mainCell1, mainCell2, mainCell3, mainCell4, mainCell5, mainCell6, mainCell7, mainCell8, mainCell9));
+            sdlManager.getScreenManager().setMenu(Arrays.asList(mainCell1, mainCell2, mainCell3, mainCell4, mainCell5, mainCell6, mainCell7, mainCell8, mainCell9, mainCell10));
         }
     }
     List<ChoiceCell> choiceCellList;
@@ -321,14 +324,7 @@ public class SdlService extends Service {
                 public void onChoiceSelected(ChoiceCell choiceCell, TriggerSource triggerSource, int rowIndex) {
                    // (choiceCell.getText() + " was selected");
                     TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.TEXT_WITH_GRAPHIC.toString());
-                    sdlManager.getScreenManager().beginTransaction();
-                    sdlManager.getScreenManager().changeLayout(templateConfiguration, null);
-                    sdlManager.getScreenManager().setTextField1(choiceCell.getText() + " was selected");
-                    sdlManager.getScreenManager().setTextField2("Pop up menu Information TODO..");
-                    sdlManager.getScreenManager().setTextField3(null);
-                    sdlManager.getScreenManager().setTextField4(null);
-
-                    sdlManager.getScreenManager().commit(null);
+                    updateScreen(choiceCell.getText() + " was selected", "Pop up menu Information TODO..", null, null, "Pop Up Menu", null, templateConfiguration, artwork1, null);
                     updateMenu(true);
                 }
 
@@ -341,19 +337,28 @@ public class SdlService extends Service {
     }
 
     private void setSlider() {
+        Slider slider = new Slider();
+        slider.setNumTicks(5);
+        slider.setPosition(1);
+        slider.setSliderHeader("This is a header");
+        slider.setSliderFooter(Collections.singletonList("Static Footer"));
+        slider.setCancelID(5006);
 
-
+        slider.setOnRPCResponseListener(new OnRPCResponseListener() {
+            @Override
+            public void onResponse(int correlationId, RPCResponse response) {
+                if (response.getSuccess()) {
+                    SliderResponse sliderResponse = (SliderResponse) response;
+                    DebugTool.logInfo("julian", "Slider Position Set: " + sliderResponse.getSliderPosition());
+                }
+            }
+        });
+        sdlManager.sendRPC(slider);
     }
 
     private void setMainScreenTextFields() {
-        sdlManager.getScreenManager().beginTransaction();
-        sdlManager.getScreenManager().setTextField1("1. There are up to four available text fields ");
-        sdlManager.getScreenManager().setTextField2("2. That can be displayed on screen,");
-        sdlManager.getScreenManager().setTextField3("3. Depending on the screen layout selected");
-        sdlManager.getScreenManager().setTextField4("4. Text field 4");
-        sdlManager.getScreenManager().setTitle("Title Field");
-        sdlManager.getScreenManager().setPrimaryGraphic(null);
-        sdlManager.getScreenManager().commit(null);
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.GRAPHIC_WITH_TEXT.toString());
+        updateScreen("1. There are up to four available text fields ", "2. That can be displayed on screen,", "3. Depending on the screen layout selected", "4. Text field 4", "Title Field", null, templateConfiguration, artwork2, null);
         updateMenu(true);
     }
 
@@ -453,6 +458,17 @@ public class SdlService extends Service {
         SoftButtonObject softButtonObject3 = new SoftButtonObject("Button3", softButtonState3, new SoftButtonObject.OnEventListener() {
             @Override
             public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+                SubtleAlert subtleAlert = new SubtleAlert()
+                        .setAlertText1("Line 1")
+                        .setAlertText2("Line 2")
+                        .setCancelID(5001);
+                sdlManager.addOnRPCNotificationListener(FunctionID.ON_SUBTLE_ALERT_PRESSED, new OnRPCNotificationListener() {
+                    @Override
+                    public void onNotified(RPCNotification notification) {
+                        sdlManager.getScreenManager().setTextField2("Subtle Alert dismissed");
+                    }
+                });
+                sdlManager.sendRPC(subtleAlert);
 
             }
 
@@ -465,6 +481,29 @@ public class SdlService extends Service {
         SoftButtonObject softButtonObject4 = new SoftButtonObject("Button4", softButtonState4, new SoftButtonObject.OnEventListener() {
             @Override
             public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+                // Soft buttons
+                final int softButtonId = 123; // Set it to any unique ID
+                SoftButton okButton = new SoftButton(SoftButtonType.SBT_TEXT, softButtonId);
+                okButton.setText("OK");
+
+                // Set the softbuttons(s) to the subtle alert
+                SubtleAlert subtleAlert = new SubtleAlert()
+                        .setAlertText1("Line 1")
+                        .setAlertText2("Line 2")
+                        .setCancelID(5001);
+                subtleAlert.setSoftButtons(Collections.singletonList(okButton));
+
+                // This listener is only needed once, and will work for all of soft buttons you send with your subtle alert
+                sdlManager.addOnRPCNotificationListener(FunctionID.ON_BUTTON_PRESS, new OnRPCNotificationListener() {
+                    @Override
+                    public void onNotified(RPCNotification notification) {
+                        OnButtonPress onButtonPress = (OnButtonPress) notification;
+                        if (onButtonPress.getCustomButtonID() == softButtonId) {
+                            sdlManager.getScreenManager().setTextField2("Ok button pressed");
+                        }
+                    }
+                });
+                sdlManager.sendRPC(subtleAlert);
 
             }
 
@@ -479,45 +518,186 @@ public class SdlService extends Service {
         TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.NON_MEDIA.toString());
 
         updateMenu(true);
-        updateScreen("Click on a button below to see an example of an Alert", null, null, null, "AlertScreen", softButtonObjectList, templateConfiguration );
+        updateScreen("Click on a button below to see an example of an Alert", null, null, null, "AlertScreen", softButtonObjectList, templateConfiguration, artwork1, null);
 
     }
 
-    private void updateScreen(String textField1, String textField2, String textField3, String textField4, String titleField, List<SoftButtonObject> softButtonObjectList, TemplateConfiguration templateConfiguration) {
+    private void updateScreen(String textField1, String textField2, String textField3, String textField4, String titleField, List<SoftButtonObject> softButtonObjectList, TemplateConfiguration templateConfiguration, SdlArtwork primaryGraphic, SdlArtwork secondaryGraphic) {
         DebugTool.logInfo("Julian", "updateScreen");
-        if (templateConfiguration == null) {
-            sdlManager.getScreenManager().beginTransaction();
-            sdlManager.getScreenManager().setTextField1(textField1);
-            sdlManager.getScreenManager().setTextField2(textField2);
-            sdlManager.getScreenManager().setTextField2(textField3);
-            sdlManager.getScreenManager().setTextField2(textField4);
-            sdlManager.getScreenManager().setTitle(titleField);
-            sdlManager.getScreenManager().setSoftButtonObjects(softButtonObjectList);
-            sdlManager.getScreenManager().commit(new CompletionListener() {
-                @Override
-                public void onComplete(boolean success) {
+
+        updateScreenTemplate(templateConfiguration, new CompletionListener() {
+            @Override
+            public void onComplete(boolean success) {
+                sdlManager.getScreenManager().beginTransaction();
+                sdlManager.getScreenManager().setTextField1(textField1);
+                sdlManager.getScreenManager().setTextField2(textField2);
+                sdlManager.getScreenManager().setTextField3(textField3);
+                sdlManager.getScreenManager().setTextField4(textField4);
+                if(primaryGraphic != null){
+                    sdlManager.getScreenManager().setPrimaryGraphic(primaryGraphic);
+                    sdlManager.getScreenManager().setSecondaryGraphic(secondaryGraphic);
                 }
-            });
-        } else {
+                sdlManager.getScreenManager().setTitle(titleField);
+                List<SoftButtonObject> updateList  = softButtonObjectList != null ? softButtonObjectList : Collections.EMPTY_LIST;
+                sdlManager.getScreenManager().setSoftButtonObjects(updateList);
+                sdlManager.getScreenManager().commit(null);
+            }
+        });
+    }
+
+    TemplateColorScheme getDefaultDay () {
+        RGBColor white = new RGBColor(249, 251, 254);
+        RGBColor lightBlue = new RGBColor(159, 219, 237);
+        RGBColor black = new RGBColor(0, 0, 0);
+
+        TemplateColorScheme dayColorScheme = new TemplateColorScheme()
+                .setBackgroundColor(white)
+                .setPrimaryColor(black)
+                .setSecondaryColor(lightBlue);
+        return dayColorScheme;
+    }
+
+    TemplateColorScheme getDefaultNight () {
+        RGBColor white = new RGBColor(249, 251, 254);
+        RGBColor darkGrey = new RGBColor(33, 37, 41);
+        RGBColor black = new RGBColor(0, 0, 0);
+        TemplateColorScheme nightColorScheme = new TemplateColorScheme()
+                .setBackgroundColor(darkGrey)
+                .setPrimaryColor(white)
+                .setSecondaryColor(black);
+        return nightColorScheme;
+    }
+
+
+    private void updateScreenTemplate(TemplateConfiguration templateConfiguration, CompletionListener listener) {
+        if (templateConfiguration != null) {
+            if (templateConfiguration.getDayColorScheme() == null) {
+                templateConfiguration.setDayColorScheme(getDefaultDay());
+                templateConfiguration.setNightColorScheme(getDefaultNight());
+            }
             sdlManager.getScreenManager().beginTransaction();
             sdlManager.getScreenManager().changeLayout(templateConfiguration, null);
             sdlManager.getScreenManager().commit(new CompletionListener() {
                 @Override
                 public void onComplete(boolean success) {
-                    sdlManager.getScreenManager().beginTransaction();
-                    sdlManager.getScreenManager().setTextField1(textField1);
-                    sdlManager.getScreenManager().setTextField2(textField2);
-                    sdlManager.getScreenManager().setTextField2(textField3);
-                    sdlManager.getScreenManager().setTextField2(textField4);
-                    sdlManager.getScreenManager().setTitle(titleField);
-                    sdlManager.getScreenManager().setSoftButtonObjects(softButtonObjectList);
-                    sdlManager.getScreenManager().commit(new CompletionListener() {
-                        @Override
-                        public void onComplete(boolean success) {
-                        }
-                    });
+                    listener.onComplete(true);
                 }
             });
+        } else {
+            listener.onComplete(true);
         }
     }
+
+    private void setOnScreenButtons() {
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.TEXTBUTTONS_ONLY.toString());
+        updateScreen(null, null, null, null, "Buttons", softButtonObjectList(),templateConfiguration, null, null);
+        updateMenu(true);
+    }
+
+    private List<SoftButtonObject> softButtonObjectList() {
+        SoftButtonState softButtonState1 = new SoftButtonState("state1", "State1", null);
+        SoftButtonState softButtonState2 = new SoftButtonState("state2", "State2", null);
+        SoftButtonState softButtonState3 = new SoftButtonState("state3", "State3", null);
+        SoftButtonState softButtonState4 = new SoftButtonState("state4", "State4", null);
+        SoftButtonState softButtonState5 = new SoftButtonState("state5", "State5", null);
+        SoftButtonState softButtonState6 = new SoftButtonState("state6", "State6", null);
+        SoftButtonState softButtonState7 = new SoftButtonState("state7", "State7", null);
+        SoftButtonState softButtonState8 = new SoftButtonState("state8", "State8", null);
+        SoftButtonObject.OnEventListener onEventListener = new SoftButtonObject.OnEventListener() {
+            @Override
+            public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+                DebugTool.logInfo("Julian", "Softbutton Pressed: " + softButtonObject.getName());
+
+            }
+
+            @Override
+            public void onEvent(SoftButtonObject softButtonObject, OnButtonEvent onButtonEvent) {
+
+            }
+        };
+
+        SoftButtonObject softButtonObject1 = new SoftButtonObject("SoftButton1", softButtonState1, onEventListener);
+        SoftButtonObject softButtonObject2 = new SoftButtonObject("SoftButton2", softButtonState2, onEventListener);
+        SoftButtonObject softButtonObject3 = new SoftButtonObject("SoftButton3", softButtonState3, onEventListener);
+        SoftButtonObject softButtonObject4 = new SoftButtonObject("SoftButton4", softButtonState4, onEventListener);
+        SoftButtonObject softButtonObject5 = new SoftButtonObject("SoftButton5", softButtonState5, onEventListener);
+        SoftButtonObject softButtonObject6 = new SoftButtonObject("SoftButton6", softButtonState6, onEventListener);
+
+        return Arrays.asList(softButtonObject1, softButtonObject2, softButtonObject3, softButtonObject4, softButtonObject5, softButtonObject6);
+    }
+
+    private void setScrollableMessage() {
+        // Create Message To Display
+        String scrollableMessageText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare. Purus in massa tempor nec feugiat nisl pretium fusce id. Pharetra convallis posuere morbi leo urna molestie at elementum eu. Dictum sit amet justo donec enim.";
+
+        // Create SoftButtons
+        SoftButton softButton1 = new SoftButton(SoftButtonType.SBT_TEXT, 0);
+        softButton1.setText("Button 1");
+
+        SoftButton softButton2 = new SoftButton(SoftButtonType.SBT_TEXT, 1);
+        softButton2.setText("Button 2");
+
+         // Create SoftButton Array
+        List<SoftButton> softButtonList = Arrays.asList(softButton1, softButton2);
+
+        // Create ScrollableMessage Object
+        ScrollableMessage scrollableMessage = new ScrollableMessage()
+                .setScrollableMessageBody(scrollableMessageText)
+                .setTimeout(50000)
+                .setSoftButtons(softButtonList);
+
+        // Set cancelId
+        scrollableMessage.setCancelID(50002);
+
+         // Send the scrollable message
+        sdlManager.sendRPC(scrollableMessage);
+    }
+
+    private void setBlackAndWhiteDesign() {
+        RGBColor black = new RGBColor(0,0,0);
+        RGBColor white = new RGBColor(255,255,255);
+        RGBColor green = new RGBColor(58,167,109);
+
+
+
+
+        TemplateColorScheme templateColorScheme = new TemplateColorScheme();
+
+        templateColorScheme.setBackgroundColor(black);
+        templateColorScheme.setPrimaryColor(white);
+        templateColorScheme.setSecondaryColor(green);
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration();
+        templateConfiguration.setTemplate(PredefinedLayout.MEDIA.toString());
+        templateConfiguration.setDayColorScheme(templateColorScheme);
+        templateConfiguration.setNightColorScheme(templateColorScheme);
+        SdlArtwork artwork = new SdlArtwork("brandArtwork1", FileType.GRAPHIC_PNG, R.drawable.ride, false);
+
+        updateScreen("Ride App", null, null, null,"Ride", Collections.EMPTY_LIST, templateConfiguration, artwork, null);
+        //updateMenu(true);
+    }
+
+    private void setPinkAndWhiteDesign() {
+        RGBColor pink = new RGBColor(255,0,191);
+        RGBColor black = new RGBColor(17,17,31);
+        RGBColor green = new RGBColor(58,167,109);
+
+
+
+
+        TemplateColorScheme templateColorScheme = new TemplateColorScheme();
+
+        templateColorScheme.setBackgroundColor(pink);
+        templateColorScheme.setPrimaryColor(black);
+        templateColorScheme.setSecondaryColor(green);
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration();
+        templateConfiguration.setTemplate(PredefinedLayout.GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS.toString());
+        templateConfiguration.setDayColorScheme(templateColorScheme);
+        templateConfiguration.setNightColorScheme(templateColorScheme);
+        SdlArtwork artwork = new SdlArtwork("brandArtwork2", FileType.GRAPHIC_PNG, R.drawable.ride2, false);
+
+        updateScreen("Ride app 2", null, null, null,"Ride app 2", Collections.EMPTY_LIST, templateConfiguration, artwork, null);
+        updateMenu(true);
+    }
+
+
 }
