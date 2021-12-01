@@ -23,6 +23,9 @@ import com.smartdevicelink.managers.screen.SoftButtonState;
 import com.smartdevicelink.managers.screen.choiceset.ChoiceCell;
 import com.smartdevicelink.managers.screen.choiceset.ChoiceSet;
 import com.smartdevicelink.managers.screen.choiceset.ChoiceSetSelectionListener;
+import com.smartdevicelink.managers.screen.choiceset.KeyboardAutocompleteCompletionListener;
+import com.smartdevicelink.managers.screen.choiceset.KeyboardCharacterSetCompletionListener;
+import com.smartdevicelink.managers.screen.choiceset.KeyboardListener;
 import com.smartdevicelink.managers.screen.menu.MenuCell;
 import com.smartdevicelink.managers.screen.menu.MenuSelectionListener;
 import com.smartdevicelink.protocol.enums.FunctionID;
@@ -43,6 +46,7 @@ import com.smartdevicelink.proxy.rpc.enums.AppHMIType;
 import com.smartdevicelink.proxy.rpc.enums.FileType;
 import com.smartdevicelink.proxy.rpc.enums.HMILevel;
 import com.smartdevicelink.proxy.rpc.enums.InteractionMode;
+import com.smartdevicelink.proxy.rpc.enums.KeyboardEvent;
 import com.smartdevicelink.proxy.rpc.enums.Language;
 import com.smartdevicelink.proxy.rpc.enums.MenuLayout;
 import com.smartdevicelink.proxy.rpc.enums.PredefinedLayout;
@@ -228,27 +232,13 @@ public class SdlService extends Service {
             }
         });
 
-        // SUB MENU
-
-        MenuCell subCell1 = new MenuCell("Graphic with Text", null, null, null, null, null, new MenuSelectionListener() {
-            @Override
-            public void onTriggered(TriggerSource trigger) {
-            }
-        });
-
-        MenuCell subCell2 = new MenuCell("Text with Graphic", null, null, null, null, null, new MenuSelectionListener() {
-            @Override
-            public void onTriggered(TriggerSource trigger) {
-            }
-        });
-
-        MenuCell subCell3 = new MenuCell("Double Graphic with Soft Buttons", null, null, null, null, null, new MenuSelectionListener() {
-            @Override
-            public void onTriggered(TriggerSource trigger) {
-            }
-        });
         // sub menu parent cell
-         mainCell5 = new MenuCell("Screen Layouts", null, null, MenuLayout.LIST, livio, null, Arrays.asList(subCell1, subCell2, subCell3));
+        mainCell5 = new MenuCell("TODO", null, null, null, null, null, new MenuSelectionListener() {
+            @Override
+            public void onTriggered(TriggerSource trigger) {
+
+            }
+        });
 
          mainCell6 = new MenuCell("On Screen Buttons", null, null, null,null, null, new MenuSelectionListener() {
             @Override
@@ -277,6 +267,7 @@ public class SdlService extends Service {
         mainCell9 = new MenuCell("Pop up Keyboards", null, null, null,null, null, new MenuSelectionListener() {
             @Override
             public void onTriggered(TriggerSource trigger) {
+                setPopUpKeyboard();
             }
 
         });
@@ -303,9 +294,9 @@ public class SdlService extends Service {
     private void updateMenu(boolean mainScreenBack) {
         // if not on Home screen, have a back to main screen button
         if (mainScreenBack) {
-            sdlManager.getScreenManager().setMenu(Arrays.asList(mainCellBack, mainCell1, mainCell2, mainCell3, mainCell4, mainCell5, mainCell6, mainCell7, mainCell8, mainCell9, mainCell10));
+            sdlManager.getScreenManager().setMenu(Arrays.asList(mainCellBack, mainCell1, mainCell2, mainCell3, mainCell4, mainCell6, mainCell7, mainCell8, mainCell9, mainCell10));
         } else {
-            sdlManager.getScreenManager().setMenu(Arrays.asList(mainCell1, mainCell2, mainCell3, mainCell4, mainCell5, mainCell6, mainCell7, mainCell8, mainCell9, mainCell10));
+            sdlManager.getScreenManager().setMenu(Arrays.asList(mainCell1, mainCell2, mainCell3, mainCell4, mainCell6, mainCell7, mainCell8, mainCell9, mainCell10));
         }
     }
     List<ChoiceCell> choiceCellList;
@@ -351,6 +342,7 @@ public class SdlService extends Service {
         };
         SoftButtonObject softButtonObject = new SoftButtonObject("SliderButton", softButtonState, onEventListener);
         updateScreen("Slider position: " + sliderPosition, null, null, null, "Slider", Collections.singletonList(softButtonObject), templateConfiguration,null,null);
+        updateMenu(true);
     }
 
     private void setSlider() {
@@ -436,6 +428,7 @@ public class SdlService extends Service {
                 SoftButtonObject noButton = new SoftButtonObject("noButton", softButtonStateNo, new SoftButtonObject.OnEventListener() {
                     @Override
                     public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+                        sdlManager.getScreenManager().setTextField2("No button pressed");
 
                     }
 
@@ -647,10 +640,10 @@ public class SdlService extends Service {
         String scrollableMessageText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare. Purus in massa tempor nec feugiat nisl pretium fusce id. Pharetra convallis posuere morbi leo urna molestie at elementum eu. Dictum sit amet justo donec enim.";
 
         // Create SoftButtons
-        SoftButton softButton1 = new SoftButton(SoftButtonType.SBT_TEXT, 0);
+        SoftButton softButton1 = new SoftButton(SoftButtonType.SBT_TEXT, 256);
         softButton1.setText("Button 1");
 
-        SoftButton softButton2 = new SoftButton(SoftButtonType.SBT_TEXT, 1);
+        SoftButton softButton2 = new SoftButton(SoftButtonType.SBT_TEXT, 255);
         softButton2.setText("Button 2");
 
          // Create SoftButton Array
@@ -710,5 +703,60 @@ public class SdlService extends Service {
 
         updateScreen("Ride app 2", null, null, null,"Ride app 2", null, templateConfiguration, artwork, null);
         updateMenu(true);
+    }
+
+    private void keyboardScreen(String inputText) {
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS.toString());
+        SoftButtonState softButtonState = new SoftButtonState("keyboard", "Redeploy Keyboard", null);
+        SoftButtonObject.OnEventListener onEventListener = new SoftButtonObject.OnEventListener() {
+            @Override
+            public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+                setPopUpKeyboard();
+            }
+
+            @Override
+            public void onEvent(SoftButtonObject softButtonObject, OnButtonEvent onButtonEvent) {
+
+            }
+        };
+        SoftButtonObject softButtonObject = new SoftButtonObject("keyboard", softButtonState, onEventListener);
+        updateScreen("Keyboard Text: " + inputText, null, null, null, "Keyboard", Collections.singletonList(softButtonObject), templateConfiguration,null,null);
+        updateMenu(true);
+    }
+    private void setPopUpKeyboard() {
+        KeyboardListener kbList = new KeyboardListener() {
+            @Override
+            public void onUserDidSubmitInput(String inputText, KeyboardEvent event) {
+                keyboardScreen(inputText);
+                DebugTool.logInfo("Julian", " " + inputText);
+            }
+
+            @Override
+            public void onKeyboardDidAbortWithReason(KeyboardEvent event) {
+                keyboardScreen("No input submitted");
+            }
+
+            @Override
+            public void updateAutocompleteWithInput(String currentInputText, KeyboardAutocompleteCompletionListener keyboardAutocompleteCompletionListener) {
+
+            }
+
+            @Override
+            public void updateCharacterSetWithInput(String currentInputText, KeyboardCharacterSetCompletionListener keyboardCharacterSetCompletionListener) {
+
+            }
+
+            @Override
+            public void onKeyboardDidSendEvent(KeyboardEvent event, String currentInputText) {
+
+            }
+
+            @Override
+            public void onKeyboardDidUpdateInputMask(KeyboardEvent event) {
+
+            }
+        };
+        sdlManager.getScreenManager().presentKeyboard("Enter text and press enter:", null, kbList);
+
     }
 }
