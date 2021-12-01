@@ -233,7 +233,6 @@ public class SdlService extends Service {
         MenuCell subCell1 = new MenuCell("Graphic with Text", null, null, null, null, null, new MenuSelectionListener() {
             @Override
             public void onTriggered(TriggerSource trigger) {
-
             }
         });
 
@@ -364,13 +363,7 @@ public class SdlService extends Service {
 
     private void setScreenImages() {
         TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.DOUBLE_GRAPHIC_WITH_SOFTBUTTONS.toString());
-
-        sdlManager.getScreenManager().beginTransaction();
-        sdlManager.getScreenManager().changeLayout(templateConfiguration, null);
-        sdlManager.getScreenManager().setPrimaryGraphic(artwork1);
-        sdlManager.getScreenManager().setSecondaryGraphic(artwork2);
-        sdlManager.getScreenManager().setSoftButtonObjects(Collections.EMPTY_LIST);
-        sdlManager.getScreenManager().commit(null);
+        updateScreen(null, null, null, null, "Screen Images", null, templateConfiguration, artwork1, artwork2);
         updateMenu(true);
     }
 
@@ -676,7 +669,7 @@ public class SdlService extends Service {
         templateConfiguration.setNightColorScheme(templateColorScheme);
         SdlArtwork artwork = new SdlArtwork("brandArtwork1", FileType.GRAPHIC_PNG, R.drawable.ride, false);
 
-        updateScreen("Ride App", null, null, null,"Ride", Collections.EMPTY_LIST, templateConfiguration, artwork, null);
+        updateScreen("Ride App", null, null, null,"Ride", null, templateConfiguration, artwork, null);
         //updateMenu(true);
     }
 
@@ -699,9 +692,7 @@ public class SdlService extends Service {
         templateConfiguration.setNightColorScheme(templateColorScheme);
         SdlArtwork artwork = new SdlArtwork("brandArtwork2", FileType.GRAPHIC_PNG, R.drawable.ride2, false);
 
-        updateScreen("Ride app 2", null, null, null,"Ride app 2", Collections.EMPTY_LIST, templateConfiguration, artwork, null);
+        updateScreen("Ride app 2", null, null, null,"Ride app 2", null, templateConfiguration, artwork, null);
         updateMenu(true);
     }
-
-
 }
