@@ -67,8 +67,8 @@ public class SdlService extends Service {
 
     private static final String APP_NAME = "SDL";
     private static final String APP_ID = "8678309";
-    private static final int TCP_PORT = 13863;
-    private static final String DEV_MACHINE_IP_ADDRESS = "m.sdl.tools";
+    private static final int TCP_PORT = 12345;
+    private static final String DEV_MACHINE_IP_ADDRESS = "10.0.0.86";
 
     private SdlManager sdlManager = null;
     private static final int FOREGROUND_SERVICE_ID = 111;
@@ -595,18 +595,22 @@ public class SdlService extends Service {
     }
 
     private List<SoftButtonObject> softButtonObjectList() {
-        SoftButtonState softButtonState1 = new SoftButtonState("state1", "State1", null);
-        SoftButtonState softButtonState2 = new SoftButtonState("state2", "State2", null);
-        SoftButtonState softButtonState3 = new SoftButtonState("state3", "State3", null);
-        SoftButtonState softButtonState4 = new SoftButtonState("state4", "State4", null);
-        SoftButtonState softButtonState5 = new SoftButtonState("state5", "State5", null);
-        SoftButtonState softButtonState6 = new SoftButtonState("state6", "State6", null);
-        SoftButtonState softButtonState7 = new SoftButtonState("state7", "State7", null);
-        SoftButtonState softButtonState8 = new SoftButtonState("state8", "State8", null);
+        SoftButtonState softButtonState1 = new SoftButtonState("state1", "Press Me", null);
+        SoftButtonState softButtonState2 = new SoftButtonState("state2", "Button 2", null);
+        SoftButtonState softButtonState3 = new SoftButtonState("state3", "Button 3", null);
+        SoftButtonState softButtonState4 = new SoftButtonState("state4", "Button 4", null);
+        SoftButtonState softButtonState5 = new SoftButtonState("state5", "Button 5", null);
+        SoftButtonState softButtonState6 = new SoftButtonState("state6", "Button 6", null);
+        SoftButtonState softButtonState11 = new SoftButtonState("state7", "Press me again!", null);
+        SoftButtonState softButtonState111 = new SoftButtonState("state8", "Go Back", new SdlArtwork(StaticIconName.BACK));
         SoftButtonObject.OnEventListener onEventListener = new SoftButtonObject.OnEventListener() {
             @Override
             public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
-                DebugTool.logInfo("Julian", "Softbutton Pressed: " + softButtonObject.getName());
+                sdlManager.getScreenManager().setTitle(softButtonObject.getName() + " Pressed");
+                if (softButtonObject.getName().equals("Button 1")) {
+                    softButtonObject.transitionToNextState();
+                }
+
 
             }
 
@@ -616,12 +620,12 @@ public class SdlService extends Service {
             }
         };
 
-        SoftButtonObject softButtonObject1 = new SoftButtonObject("SoftButton1", softButtonState1, onEventListener);
-        SoftButtonObject softButtonObject2 = new SoftButtonObject("SoftButton2", softButtonState2, onEventListener);
-        SoftButtonObject softButtonObject3 = new SoftButtonObject("SoftButton3", softButtonState3, onEventListener);
-        SoftButtonObject softButtonObject4 = new SoftButtonObject("SoftButton4", softButtonState4, onEventListener);
-        SoftButtonObject softButtonObject5 = new SoftButtonObject("SoftButton5", softButtonState5, onEventListener);
-        SoftButtonObject softButtonObject6 = new SoftButtonObject("SoftButton6", softButtonState6, onEventListener);
+        SoftButtonObject softButtonObject1 = new SoftButtonObject("Button 1", Arrays.asList(softButtonState1, softButtonState11, softButtonState111), softButtonState1.getName(), onEventListener);
+        SoftButtonObject softButtonObject2 = new SoftButtonObject("Button 2", softButtonState2, onEventListener);
+        SoftButtonObject softButtonObject3 = new SoftButtonObject("Button 3", softButtonState3, onEventListener);
+        SoftButtonObject softButtonObject4 = new SoftButtonObject("Button 4", softButtonState4, onEventListener);
+        SoftButtonObject softButtonObject5 = new SoftButtonObject("Button 5", softButtonState5, onEventListener);
+        SoftButtonObject softButtonObject6 = new SoftButtonObject("Button 6", softButtonState6, onEventListener);
 
         return Arrays.asList(softButtonObject1, softButtonObject2, softButtonObject3, softButtonObject4, softButtonObject5, softButtonObject6);
     }
