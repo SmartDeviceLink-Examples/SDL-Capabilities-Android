@@ -73,7 +73,7 @@ public class SdlService extends Service {
     private SdlManager sdlManager = null;
     private static final int FOREGROUND_SERVICE_ID = 111;
 
-    SoftButtonObject backToMainScreen;
+    Integer sliderPosition = 3;
 
     @Nullable
     @Override
@@ -335,12 +335,30 @@ public class SdlService extends Service {
         }
     }
 
+    private void sliderScreen() {
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS.toString());
+        SoftButtonState softButtonState = new SoftButtonState("sliderDeploy", "Redeploy Slider", null);
+        SoftButtonObject.OnEventListener onEventListener = new SoftButtonObject.OnEventListener() {
+            @Override
+            public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+                setSlider();
+            }
+
+            @Override
+            public void onEvent(SoftButtonObject softButtonObject, OnButtonEvent onButtonEvent) {
+
+            }
+        };
+        SoftButtonObject softButtonObject = new SoftButtonObject("SliderButton", softButtonState, onEventListener);
+        updateScreen("Slider position: " + sliderPosition, null, null, null, "Slider", Collections.singletonList(softButtonObject), templateConfiguration,null,null);
+    }
+
     private void setSlider() {
         Slider slider = new Slider();
-        slider.setNumTicks(5);
-        slider.setPosition(1);
-        slider.setSliderHeader("This is a header");
-        slider.setSliderFooter(Collections.singletonList("Static Footer"));
+        slider.setNumTicks(6);
+        slider.setPosition(sliderPosition);
+        slider.setSliderHeader("Header");
+        slider.setSliderFooter(Collections.singletonList("Footer"));
         slider.setCancelID(5006);
 
         slider.setOnRPCResponseListener(new OnRPCResponseListener() {
@@ -348,7 +366,8 @@ public class SdlService extends Service {
             public void onResponse(int correlationId, RPCResponse response) {
                 if (response.getSuccess()) {
                     SliderResponse sliderResponse = (SliderResponse) response;
-                    DebugTool.logInfo("julian", "Slider Position Set: " + sliderResponse.getSliderPosition());
+                    sliderPosition = sliderResponse.getSliderPosition();
+                    sliderScreen();
                 }
             }
         });
@@ -483,7 +502,7 @@ public class SdlService extends Service {
                 SubtleAlert subtleAlert = new SubtleAlert()
                         .setAlertText1("Line 1")
                         .setAlertText2("Line 2")
-                        .setCancelID(5001);
+                        .setCancelID(5002);
                 subtleAlert.setSoftButtons(Collections.singletonList(okButton));
 
                 // This listener is only needed once, and will work for all of soft buttons you send with your subtle alert
@@ -677,9 +696,6 @@ public class SdlService extends Service {
         RGBColor pink = new RGBColor(255,0,191);
         RGBColor black = new RGBColor(17,17,31);
         RGBColor green = new RGBColor(58,167,109);
-
-
-
 
         TemplateColorScheme templateColorScheme = new TemplateColorScheme();
 
