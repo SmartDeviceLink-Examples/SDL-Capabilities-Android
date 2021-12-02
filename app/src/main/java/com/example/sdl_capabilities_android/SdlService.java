@@ -70,7 +70,7 @@ import java.util.Vector;
 public class SdlService extends Service {
 
     private static final String APP_NAME = "SDL";
-    private static final String APP_ID = "8678309";
+    private static final String APP_ID = "112233445566";
     private static final int TCP_PORT = 12345;
     private static final String DEV_MACHINE_IP_ADDRESS = "10.0.0.86";
 
@@ -164,7 +164,7 @@ public class SdlService extends Service {
             };
 
             // Create App Icon, this is set in the SdlManager builder
-            SdlArtwork appIcon = new SdlArtwork("sdlIcon", FileType.GRAPHIC_PNG, R.mipmap.ic_launcher, true);
+            SdlArtwork appIcon = new SdlArtwork("appIcon", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, true);
 
             // The manager builder sets options for your session
             SdlManager.Builder builder = new SdlManager.Builder(this, APP_ID, APP_NAME, listener);
@@ -177,8 +177,8 @@ public class SdlService extends Service {
 
         return START_STICKY;
     }
-    SdlArtwork artwork1 = new SdlArtwork("SdlIcon", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, false);
-    SdlArtwork artwork2 = new SdlArtwork("SdlIcon2", FileType.GRAPHIC_PNG, R.drawable.sdl_lockscreen_icon, false);
+    SdlArtwork artwork1 = new SdlArtwork("appIcon2", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, false);
+    SdlArtwork artwork2 = new SdlArtwork("appIcon3", FileType.GRAPHIC_PNG, R.drawable.sdl_lockscreen_icon, false);
 
     private void setMainScreen () {
         TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.TEXT_WITH_GRAPHIC.toString());
@@ -528,7 +528,6 @@ public class SdlService extends Service {
     }
 
     private void updateScreen(String textField1, String textField2, String textField3, String textField4, String titleField, List<SoftButtonObject> softButtonObjectList, TemplateConfiguration templateConfiguration, SdlArtwork primaryGraphic, SdlArtwork secondaryGraphic) {
-        DebugTool.logInfo("Julian", "updateScreen");
 
         updateScreenTemplate(templateConfiguration, new CompletionListener() {
             @Override
