@@ -271,21 +271,37 @@ public class SdlService extends Service {
             }
 
         });
-        MenuCell sub10Cell1 = new MenuCell("Fake Uber", null, null, null, null, null, new MenuSelectionListener() {
+
+        SdlArtwork carGoLogo = new SdlArtwork("carGoLogo", FileType.GRAPHIC_PNG, R.drawable.cargo_logo, false);
+        SdlArtwork carGoAppIcon = new SdlArtwork("carGoAppIcon", FileType.GRAPHIC_PNG, R.drawable.cargo_app_icon, false);
+
+        MenuCell sub10Cell1 = new MenuCell("CarGo", null, null, carGoAppIcon, carGoLogo, null, new MenuSelectionListener() {
             @Override
             public void onTriggered(TriggerSource trigger) {
-                setBlackAndWhiteDesign();
+                setCarGo();
 
             }
         });
 
-        MenuCell sub10Cell2 = new MenuCell("Need a Lyft", null, null, null, null, null, new MenuSelectionListener() {
+        SdlArtwork bopsLogo = new SdlArtwork("bopsLogo", FileType.GRAPHIC_PNG, R.drawable.bops_logo, false);
+        SdlArtwork bopsAppIcon = new SdlArtwork("bopsAppIcon", FileType.GRAPHIC_PNG, R.drawable.bops_app_icon, false);
+
+        MenuCell sub10Cell2 = new MenuCell("BOPS", null, null, bopsAppIcon, bopsLogo, null, new MenuSelectionListener() {
             @Override
             public void onTriggered(TriggerSource trigger) {
-                setPinkAndWhiteDesign();
+                setBops();
             }
         });
-        mainCell10 = new MenuCell("Color Scheme Branding Examples", null, null, MenuLayout.LIST, livio, null, Arrays.asList(sub10Cell1, sub10Cell2));
+        SdlArtwork rydeLogo = new SdlArtwork("rydeLogo", FileType.GRAPHIC_PNG, R.drawable.ryde_logo, false);
+        SdlArtwork rydeAppIcon = new SdlArtwork("rydeAppIcon", FileType.GRAPHIC_PNG, R.drawable.ryde_app_icon, false);
+
+        MenuCell sub10Cell3 = new MenuCell("Ryde", null, null, rydeAppIcon, rydeLogo, null, new MenuSelectionListener() {
+            @Override
+            public void onTriggered(TriggerSource trigger) {
+                setRyde();
+            }
+        });
+        mainCell10 = new MenuCell("Color Scheme Branding Examples", null, null, MenuLayout.LIST, livio, null, Arrays.asList(sub10Cell1, sub10Cell2, sub10Cell3));
 
 
         updateMenu(false);
@@ -314,7 +330,7 @@ public class SdlService extends Service {
                 public void onChoiceSelected(ChoiceCell choiceCell, TriggerSource triggerSource, int rowIndex) {
                    // (choiceCell.getText() + " was selected");
                     TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.TEXT_WITH_GRAPHIC.toString());
-                    updateScreen(choiceCell.getText() + " was selected", "Pop up menu Information TODO..", null, null, "Pop Up Menu", null, templateConfiguration, artwork1, null);
+                    updateScreen(choiceCell.getText() + " was selected", "Open menu and select Pop up Menu to make another selection", null, null, "Pop Up Menu", null, templateConfiguration, artwork1, null);
                     updateMenu(true);
                 }
 
@@ -661,46 +677,82 @@ public class SdlService extends Service {
         sdlManager.sendRPC(scrollableMessage);
     }
 
-    private void setBlackAndWhiteDesign() {
-        RGBColor black = new RGBColor(0,0,0);
-        RGBColor white = new RGBColor(255,255,255);
-        RGBColor green = new RGBColor(58,167,109);
+    private void setCarGo() {
+        RGBColor background = new RGBColor(140,228,242);
+        RGBColor dark = new RGBColor(39,38,53);
+        RGBColor light = new RGBColor(232,233,243);
 
 
 
 
-        TemplateColorScheme templateColorScheme = new TemplateColorScheme();
+        TemplateColorScheme templateColorSchemeDay = new TemplateColorScheme();
 
-        templateColorScheme.setBackgroundColor(black);
-        templateColorScheme.setPrimaryColor(white);
-        templateColorScheme.setSecondaryColor(green);
+        templateColorSchemeDay.setBackgroundColor(background);
+        templateColorSchemeDay.setPrimaryColor(dark);
+        templateColorSchemeDay.setSecondaryColor(dark);
+        TemplateColorScheme templateColorSchemeNight = new TemplateColorScheme();
+
+        templateColorSchemeNight.setBackgroundColor(background);
+        templateColorSchemeNight.setPrimaryColor(light);
+        templateColorSchemeNight.setSecondaryColor(light);
         TemplateConfiguration templateConfiguration = new TemplateConfiguration();
-        templateConfiguration.setTemplate(PredefinedLayout.MEDIA.toString());
-        templateConfiguration.setDayColorScheme(templateColorScheme);
-        templateConfiguration.setNightColorScheme(templateColorScheme);
-        SdlArtwork artwork = new SdlArtwork("brandArtwork1", FileType.GRAPHIC_PNG, R.drawable.ride, false);
+        templateConfiguration.setTemplate(PredefinedLayout.TEXT_AND_SOFTBUTTONS_WITH_GRAPHIC.toString());
+        templateConfiguration.setDayColorScheme(templateColorSchemeDay);
+        templateConfiguration.setNightColorScheme(templateColorSchemeNight);
+        SdlArtwork carGoMain = new SdlArtwork("carGoMain", FileType.GRAPHIC_PNG, R.drawable.cargo_main, false);
 
-        updateScreen("Ride App", null, null, null,"Ride", null, templateConfiguration, artwork, null);
-        //updateMenu(true);
+        updateScreen("CarGo", null, null, null,"CarGo", null, templateConfiguration, carGoMain, null);
+        updateMenu(true);
     }
 
-    private void setPinkAndWhiteDesign() {
-        RGBColor pink = new RGBColor(255,0,191);
-        RGBColor black = new RGBColor(17,17,31);
-        RGBColor green = new RGBColor(58,167,109);
+    private void setRyde() {
+        RGBColor background = new RGBColor(164,247,181);
+        RGBColor dark = new RGBColor(69,88,167);
+        RGBColor light = new RGBColor(242,241,239);
 
-        TemplateColorScheme templateColorScheme = new TemplateColorScheme();
+        TemplateColorScheme templateColorSchemeDay = new TemplateColorScheme();
 
-        templateColorScheme.setBackgroundColor(pink);
-        templateColorScheme.setPrimaryColor(black);
-        templateColorScheme.setSecondaryColor(green);
+        templateColorSchemeDay.setBackgroundColor(background);
+        templateColorSchemeDay.setPrimaryColor(dark);
+        templateColorSchemeDay.setSecondaryColor(dark);
+        TemplateColorScheme templateColorSchemeNight = new TemplateColorScheme();
+
+        templateColorSchemeNight.setBackgroundColor(background);
+        templateColorSchemeNight.setPrimaryColor(light);
+        templateColorSchemeNight.setSecondaryColor(light);
         TemplateConfiguration templateConfiguration = new TemplateConfiguration();
         templateConfiguration.setTemplate(PredefinedLayout.GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS.toString());
-        templateConfiguration.setDayColorScheme(templateColorScheme);
-        templateConfiguration.setNightColorScheme(templateColorScheme);
-        SdlArtwork artwork = new SdlArtwork("brandArtwork2", FileType.GRAPHIC_PNG, R.drawable.ride2, false);
+        templateConfiguration.setDayColorScheme(templateColorSchemeDay);
+        templateConfiguration.setNightColorScheme(templateColorSchemeNight);
+        SdlArtwork rydeMain = new SdlArtwork("rydeMain", FileType.GRAPHIC_PNG, R.drawable.ryde_main, false);
 
-        updateScreen("Ride app 2", null, null, null,"Ride app 2", null, templateConfiguration, artwork, null);
+        updateScreen("Ryde", null, null, null,"Ryde", null, templateConfiguration, rydeMain, null);
+        updateMenu(true);
+    }
+
+    private void setBops() {
+        RGBColor background = new RGBColor(238,109,173);
+        RGBColor dark = new RGBColor(51,49,46);
+        RGBColor light = new RGBColor(250,250,250);
+
+        TemplateColorScheme templateColorSchemeDay = new TemplateColorScheme();
+
+        templateColorSchemeDay.setBackgroundColor(background);
+        templateColorSchemeDay.setPrimaryColor(dark);
+        templateColorSchemeDay.setSecondaryColor(dark);
+        TemplateColorScheme templateColorSchemeNight = new TemplateColorScheme();
+
+        templateColorSchemeNight.setBackgroundColor(background);
+        templateColorSchemeNight.setPrimaryColor(light);
+        templateColorSchemeNight.setSecondaryColor(light);
+
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration();
+        templateConfiguration.setTemplate(PredefinedLayout.MEDIA.toString());
+        templateConfiguration.setDayColorScheme(templateColorSchemeDay);
+        templateConfiguration.setNightColorScheme(templateColorSchemeNight);
+        SdlArtwork bopsMain = new SdlArtwork("bopsMain", FileType.GRAPHIC_PNG, R.drawable.bops_main, false);
+
+        updateScreen("BOPS", null, null, null,"BOPS", null, templateConfiguration, bopsMain, null);
         updateMenu(true);
     }
 
