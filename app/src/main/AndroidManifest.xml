@@ -13,6 +13,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SDLCapabilitiesAndroid" >
+        <activity
+            android:name="com.smartdevicelink.managers.lockscreen.SDLLockScreenActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name="com.example.sdl_capabilities_android.ConfigActivity"
+            android:launchMode="singleTop" />
     <service
         android:name=".SdlService"
         android:enabled="true"/>

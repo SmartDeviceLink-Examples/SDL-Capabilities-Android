@@ -17,6 +17,7 @@ import com.smartdevicelink.managers.SdlManager;
 import com.smartdevicelink.managers.SdlManagerListener;
 import com.smartdevicelink.managers.file.filetypes.SdlArtwork;
 import com.smartdevicelink.managers.lifecycle.LifecycleConfigurationUpdate;
+import com.smartdevicelink.managers.lockscreen.LockScreenConfig;
 import com.smartdevicelink.managers.screen.AlertView;
 import com.smartdevicelink.managers.screen.SoftButtonObject;
 import com.smartdevicelink.managers.screen.SoftButtonState;
@@ -116,7 +117,7 @@ public class SdlService extends Service {
 
         if (sdlManager == null) {
             //MultiplexTransportConfig transport = new MultiplexTransportConfig(this, APP_ID, MultiplexTransportConfig.FLAG_MULTI_SECURITY_OFF);
-            TCPTransportConfig transport = new TCPTransportConfig(TCP_PORT, DEV_MACHINE_IP_ADDRESS, false);
+            TCPTransportConfig transport = new TCPTransportConfig(Config.CORE_PORT, Config.CORE_IP, false);
 
             // The app type to be used
             Vector<AppHMIType> appType = new Vector<>();
@@ -165,10 +166,14 @@ public class SdlService extends Service {
 
             // Create App Icon, this is set in the SdlManager builder
             SdlArtwork appIcon = new SdlArtwork("appIcon", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, true);
+            LockScreenConfig lockScreenConfig = new LockScreenConfig();
+            lockScreenConfig.setDisplayMode(LockScreenConfig.DISPLAY_MODE_ALWAYS);
+            lockScreenConfig.enableDismissGesture(false);
 
             // The manager builder sets options for your session
             SdlManager.Builder builder = new SdlManager.Builder(this, APP_ID, APP_NAME, listener);
             builder.setAppTypes(appType);
+            builder.setLockScreenConfig(lockScreenConfig);
             builder.setTransportType(transport);
             builder.setAppIcon(appIcon);
             sdlManager = builder.build();
