@@ -356,7 +356,7 @@ public class SdlService extends Service {
     }
 
     private void sliderScreen() {
-        TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS.toString());
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.NON_MEDIA.toString());
         SoftButtonState softButtonState = new SoftButtonState("sliderDeploy", "Redeploy Slider", null);
         SoftButtonObject.OnEventListener onEventListener = new SoftButtonObject.OnEventListener() {
             @Override
@@ -667,31 +667,41 @@ public class SdlService extends Service {
         return Arrays.asList(softButtonObject1, softButtonObject2, softButtonObject3, softButtonObject4, softButtonObject5, softButtonObject6);
     }
 
+    private void setScrollableMessageScreen() {
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.NON_MEDIA.toString());
+        SoftButtonState softButtonState = new SoftButtonState("scrollMsg", "Redeploy Scrollable Message", null);
+        SoftButtonObject.OnEventListener onEventListener = new SoftButtonObject.OnEventListener() {
+            @Override
+            public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
+                setScrollableMessage();
+            }
+
+            @Override
+            public void onEvent(SoftButtonObject softButtonObject, OnButtonEvent onButtonEvent) {
+
+            }
+        };
+        SoftButtonObject softButtonObject = new SoftButtonObject("ScrollMsg", softButtonState, onEventListener);
+
+        updateScreen("ScrollableMessage", null, null, null, "Scrollable Message", Collections.singletonList(softButtonObject), templateConfiguration, artwork1, null);
+        updateMenu(true);
+    }
+
     private void setScrollableMessage() {
         // Create Message To Display
         String scrollableMessageText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare. Purus in massa tempor nec feugiat nisl pretium fusce id. Pharetra convallis posuere morbi leo urna molestie at elementum eu. Dictum sit amet justo donec enim.";
 
-        // Create SoftButtons
-        SoftButton softButton1 = new SoftButton(SoftButtonType.SBT_TEXT, 256);
-        softButton1.setText("Button 1");
-
-        SoftButton softButton2 = new SoftButton(SoftButtonType.SBT_TEXT, 255);
-        softButton2.setText("Button 2");
-
-         // Create SoftButton Array
-        List<SoftButton> softButtonList = Arrays.asList(softButton1, softButton2);
-
         // Create ScrollableMessage Object
         ScrollableMessage scrollableMessage = new ScrollableMessage()
                 .setScrollableMessageBody(scrollableMessageText)
-                .setTimeout(50000)
-                .setSoftButtons(softButtonList);
+                .setTimeout(50000);
 
         // Set cancelId
         scrollableMessage.setCancelID(50002);
 
-         // Send the scrollable message
+        // Send the scrollable message
         sdlManager.sendRPC(scrollableMessage);
+        setScrollableMessageScreen();
     }
 
     private void setCarGo() {
@@ -808,7 +818,7 @@ public class SdlService extends Service {
     }
 
     private void keyboardScreen(String inputText) {
-        TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS.toString());
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.NON_MEDIA.toString());
         SoftButtonState softButtonState = new SoftButtonState("keyboard", "Redeploy Keyboard", null);
         SoftButtonObject.OnEventListener onEventListener = new SoftButtonObject.OnEventListener() {
             @Override
