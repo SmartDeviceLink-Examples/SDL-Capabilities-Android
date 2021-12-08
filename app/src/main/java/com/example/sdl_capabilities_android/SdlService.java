@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -19,6 +20,7 @@ import com.smartdevicelink.managers.file.filetypes.SdlArtwork;
 import com.smartdevicelink.managers.lifecycle.LifecycleConfigurationUpdate;
 import com.smartdevicelink.managers.lockscreen.LockScreenConfig;
 import com.smartdevicelink.managers.screen.AlertView;
+import com.smartdevicelink.managers.screen.OnButtonListener;
 import com.smartdevicelink.managers.screen.SoftButtonObject;
 import com.smartdevicelink.managers.screen.SoftButtonState;
 import com.smartdevicelink.managers.screen.choiceset.ChoiceCell;
@@ -37,6 +39,7 @@ import com.smartdevicelink.proxy.rpc.OnButtonPress;
 import com.smartdevicelink.proxy.rpc.OnHMIStatus;
 import com.smartdevicelink.proxy.rpc.RGBColor;
 import com.smartdevicelink.proxy.rpc.ScrollableMessage;
+import com.smartdevicelink.proxy.rpc.SetMediaClockTimer;
 import com.smartdevicelink.proxy.rpc.Slider;
 import com.smartdevicelink.proxy.rpc.SliderResponse;
 import com.smartdevicelink.proxy.rpc.SoftButton;
@@ -44,6 +47,8 @@ import com.smartdevicelink.proxy.rpc.SubtleAlert;
 import com.smartdevicelink.proxy.rpc.TemplateColorScheme;
 import com.smartdevicelink.proxy.rpc.TemplateConfiguration;
 import com.smartdevicelink.proxy.rpc.enums.AppHMIType;
+import com.smartdevicelink.proxy.rpc.enums.AudioStreamingIndicator;
+import com.smartdevicelink.proxy.rpc.enums.ButtonName;
 import com.smartdevicelink.proxy.rpc.enums.FileType;
 import com.smartdevicelink.proxy.rpc.enums.HMILevel;
 import com.smartdevicelink.proxy.rpc.enums.InteractionMode;
@@ -74,6 +79,7 @@ public class SdlService extends Service {
     private static final String APP_ID = "112233445566";
     private static final int TCP_PORT = 12345;
     private static final String DEV_MACHINE_IP_ADDRESS = "10.0.0.86";
+    OnButtonListener onButtonListener;
 
     private SdlManager sdlManager = null;
     private static final int FOREGROUND_SERVICE_ID = 111;
@@ -104,6 +110,7 @@ public class SdlService extends Service {
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             stopForeground(true);
         }
@@ -558,14 +565,17 @@ public class SdlService extends Service {
                 sdlManager.getScreenManager().setTextField2(textField2);
                 sdlManager.getScreenManager().setTextField3(textField3);
                 sdlManager.getScreenManager().setTextField4(textField4);
-                if(primaryGraphic != null){
+                if (primaryGraphic != null) {
                     sdlManager.getScreenManager().setPrimaryGraphic(primaryGraphic);
                     sdlManager.getScreenManager().setSecondaryGraphic(secondaryGraphic);
                 }
                 sdlManager.getScreenManager().setTitle(titleField);
-                List<SoftButtonObject> updateList  = softButtonObjectList != null ? softButtonObjectList : Collections.EMPTY_LIST;
+                List<SoftButtonObject> updateList = softButtonObjectList != null ? softButtonObjectList : Collections.EMPTY_LIST;
                 sdlManager.getScreenManager().setSoftButtonObjects(updateList);
                 sdlManager.getScreenManager().commit(null);
+                if (templateConfiguration.getTemplate().equals(PredefinedLayout.MEDIA.toString())) {
+                    subscribeToMediaButtons();
+                }
             }
         });
     }
@@ -683,73 +693,73 @@ public class SdlService extends Service {
     }
 
     private void setCarGo() {
-        RGBColor background = new RGBColor(140,228,242);
-        RGBColor dark = new RGBColor(39,38,53);
-        RGBColor light = new RGBColor(232,233,243);
-
-
-
+        RGBColor background = new RGBColor(140, 228, 242);
+        RGBColor dark = new RGBColor(39, 38, 53);
+        RGBColor light = new RGBColor(232, 233, 243);
 
         TemplateColorScheme templateColorSchemeDay = new TemplateColorScheme();
 
         templateColorSchemeDay.setBackgroundColor(background);
-        templateColorSchemeDay.setPrimaryColor(dark);
-        templateColorSchemeDay.setSecondaryColor(dark);
+        templateColorSchemeDay.setPrimaryColor(light);
+        templateColorSchemeDay.setSecondaryColor(light);
         TemplateColorScheme templateColorSchemeNight = new TemplateColorScheme();
 
         templateColorSchemeNight.setBackgroundColor(background);
-        templateColorSchemeNight.setPrimaryColor(light);
-        templateColorSchemeNight.setSecondaryColor(light);
+        templateColorSchemeNight.setPrimaryColor(dark);
+        templateColorSchemeNight.setSecondaryColor(dark);
         TemplateConfiguration templateConfiguration = new TemplateConfiguration();
         templateConfiguration.setTemplate(PredefinedLayout.TEXT_AND_SOFTBUTTONS_WITH_GRAPHIC.toString());
         templateConfiguration.setDayColorScheme(templateColorSchemeDay);
         templateConfiguration.setNightColorScheme(templateColorSchemeNight);
         SdlArtwork carGoMain = new SdlArtwork("carGoMain", FileType.GRAPHIC_PNG, R.drawable.cargo_main, false);
 
-        updateScreen("CarGo", null, null, null,"CarGo", null, templateConfiguration, carGoMain, null);
+        updateScreen("CarGo", null, null, null, "CarGo", null, templateConfiguration, carGoMain, null);
         updateMenu(true);
     }
 
     private void setRyde() {
-        RGBColor background = new RGBColor(164,247,181);
-        RGBColor dark = new RGBColor(69,88,167);
-        RGBColor light = new RGBColor(242,241,239);
+        RGBColor background = new RGBColor(164, 247, 181);
+        RGBColor dark = new RGBColor(69, 88, 167);
+        RGBColor light = new RGBColor(242, 241, 239);
 
         TemplateColorScheme templateColorSchemeDay = new TemplateColorScheme();
 
         templateColorSchemeDay.setBackgroundColor(background);
-        templateColorSchemeDay.setPrimaryColor(dark);
-        templateColorSchemeDay.setSecondaryColor(dark);
+        templateColorSchemeDay.setPrimaryColor(light);
+        templateColorSchemeDay.setSecondaryColor(light);
         TemplateColorScheme templateColorSchemeNight = new TemplateColorScheme();
 
         templateColorSchemeNight.setBackgroundColor(background);
-        templateColorSchemeNight.setPrimaryColor(light);
-        templateColorSchemeNight.setSecondaryColor(light);
+        templateColorSchemeNight.setPrimaryColor(dark);
+        templateColorSchemeNight.setSecondaryColor(dark);
         TemplateConfiguration templateConfiguration = new TemplateConfiguration();
         templateConfiguration.setTemplate(PredefinedLayout.GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS.toString());
         templateConfiguration.setDayColorScheme(templateColorSchemeDay);
         templateConfiguration.setNightColorScheme(templateColorSchemeNight);
         SdlArtwork rydeMain = new SdlArtwork("rydeMain", FileType.GRAPHIC_PNG, R.drawable.ryde_main, false);
 
-        updateScreen("Ryde", null, null, null,"Ryde", null, templateConfiguration, rydeMain, null);
+        updateScreen("Ryde", null, null, null, "Ryde", null, templateConfiguration, rydeMain, null);
         updateMenu(true);
     }
 
     private void setBops() {
-        RGBColor background = new RGBColor(238,109,173);
-        RGBColor dark = new RGBColor(51,49,46);
-        RGBColor light = new RGBColor(250,250,250);
+        SetMediaClockTimer mediaClock = new SetMediaClockTimer().countUpFromStartTimeInterval(0, 253, AudioStreamingIndicator.PAUSE);
+        sdlManager.sendRPC(mediaClock);
+
+        RGBColor background = new RGBColor(238, 109, 173);
+        RGBColor dark = new RGBColor(51, 49, 46);
+        RGBColor light = new RGBColor(250, 250, 250);
 
         TemplateColorScheme templateColorSchemeDay = new TemplateColorScheme();
 
         templateColorSchemeDay.setBackgroundColor(background);
-        templateColorSchemeDay.setPrimaryColor(dark);
-        templateColorSchemeDay.setSecondaryColor(dark);
+        templateColorSchemeDay.setPrimaryColor(light);
+        templateColorSchemeDay.setSecondaryColor(light);
         TemplateColorScheme templateColorSchemeNight = new TemplateColorScheme();
 
         templateColorSchemeNight.setBackgroundColor(background);
-        templateColorSchemeNight.setPrimaryColor(light);
-        templateColorSchemeNight.setSecondaryColor(light);
+        templateColorSchemeNight.setPrimaryColor(dark);
+        templateColorSchemeNight.setSecondaryColor(dark);
 
         TemplateConfiguration templateConfiguration = new TemplateConfiguration();
         templateConfiguration.setTemplate(PredefinedLayout.MEDIA.toString());
@@ -757,8 +767,32 @@ public class SdlService extends Service {
         templateConfiguration.setNightColorScheme(templateColorSchemeNight);
         SdlArtwork bopsMain = new SdlArtwork("bopsMain", FileType.GRAPHIC_PNG, R.drawable.bops_main, false);
 
-        updateScreen("BOPS", null, null, null,"BOPS", null, templateConfiguration, bopsMain, null);
+        updateScreen("BOPS", null, null, null, "BOPS", null, templateConfiguration, bopsMain, null);
         updateMenu(true);
+
+        onButtonListener = new OnButtonListener() {
+            @Override
+            public void onPress(ButtonName buttonName, OnButtonPress buttonPress) {
+
+            }
+
+            @Override
+            public void onEvent(ButtonName buttonName, OnButtonEvent buttonEvent) {
+
+            }
+
+            @Override
+            public void onError(String info) {
+
+            }
+        };
+    }
+
+    private void subscribeToMediaButtons() {
+        ButtonName[] buttonNames = {ButtonName.PLAY_PAUSE, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT};
+        for (ButtonName buttonName : buttonNames) {
+            sdlManager.getScreenManager().addButtonListener(buttonName, onButtonListener);
+        }
     }
 
     private void keyboardScreen(String inputText) {
