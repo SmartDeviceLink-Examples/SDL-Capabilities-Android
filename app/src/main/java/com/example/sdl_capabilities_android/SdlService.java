@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -80,6 +79,8 @@ public class SdlService extends Service {
     private static final int TCP_PORT = 12345;
     private static final String DEV_MACHINE_IP_ADDRESS = "10.0.0.86";
     OnButtonListener onButtonListener;
+    SetMediaClockTimer mediaClock;
+    boolean isMediaPaused;
 
     private SdlManager sdlManager = null;
     private static final int FOREGROUND_SERVICE_ID = 111;
@@ -575,6 +576,7 @@ public class SdlService extends Service {
                 sdlManager.getScreenManager().commit(null);
                 if (templateConfiguration.getTemplate().equals(PredefinedLayout.MEDIA.toString())) {
                     subscribeToMediaButtons();
+                    sdlManager.getScreenManager().setMediaTrackTextField("MEDIA TRACK FIELD");
                 }
             }
         });
@@ -743,7 +745,8 @@ public class SdlService extends Service {
     }
 
     private void setBops() {
-        SetMediaClockTimer mediaClock = new SetMediaClockTimer().countUpFromStartTimeInterval(0, 253, AudioStreamingIndicator.PAUSE);
+        isMediaPaused = false;
+        mediaClock = new SetMediaClockTimer().countUpFromStartTimeInterval(0, 253, AudioStreamingIndicator.PAUSE);
         sdlManager.sendRPC(mediaClock);
 
         RGBColor background = new RGBColor(238, 109, 173);
@@ -773,7 +776,16 @@ public class SdlService extends Service {
         onButtonListener = new OnButtonListener() {
             @Override
             public void onPress(ButtonName buttonName, OnButtonPress buttonPress) {
-
+                if(buttonName == ButtonName.PLAY_PAUSE) {
+                    if (isMediaPaused){
+                        mediaClock = new SetMediaClockTimer().resumeWithPlayPauseIndicator(AudioStreamingIndicator.PAUSE);
+                        isMediaPaused = false;
+                    } else {
+                        mediaClock = new SetMediaClockTimer().pauseWithPlayPauseIndicator(AudioStreamingIndicator.PLAY);
+                        isMediaPaused = true;
+                    }
+                }
+                sdlManager.sendRPC(mediaClock);
             }
 
             @Override
