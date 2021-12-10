@@ -280,6 +280,7 @@ public class SdlService extends Service {
         mainCell9 = new MenuCell("Pop up Keyboards", null, null, null,null, null, new MenuSelectionListener() {
             @Override
             public void onTriggered(TriggerSource trigger) {
+                keyboardScreen(" ");
                 setPopUpKeyboard();
             }
 
@@ -445,7 +446,7 @@ public class SdlService extends Service {
                 SoftButtonObject yesButton = new SoftButtonObject("yesButton", softButtonStateYes, new SoftButtonObject.OnEventListener() {
                     @Override
                     public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
-                        sdlManager.getScreenManager().setTextField2("Yes button pressed");
+                        sdlManager.getScreenManager().setTextField2("The Yes button was pressed");
                     }
 
                     @Override
@@ -457,7 +458,7 @@ public class SdlService extends Service {
                 SoftButtonObject noButton = new SoftButtonObject("noButton", softButtonStateNo, new SoftButtonObject.OnEventListener() {
                     @Override
                     public void onPress(SoftButtonObject softButtonObject, OnButtonPress onButtonPress) {
-                        sdlManager.getScreenManager().setTextField2("No button pressed");
+                        sdlManager.getScreenManager().setTextField2("The No button was pressed");
 
                     }
 
@@ -533,7 +534,7 @@ public class SdlService extends Service {
                     public void onNotified(RPCNotification notification) {
                         OnButtonPress onButtonPress = (OnButtonPress) notification;
                         if (onButtonPress.getCustomButtonID() == softButtonId) {
-                            sdlManager.getScreenManager().setTextField2("Ok button pressed");
+                            sdlManager.getScreenManager().setTextField2("The Ok button was pressed");
                         }
                     }
                 });
@@ -552,7 +553,7 @@ public class SdlService extends Service {
         TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.NON_MEDIA.toString());
 
         updateMenu(true);
-        updateScreen("Click on a button below to see an example of an Alert", null, null, null, "AlertScreen", softButtonObjectList, templateConfiguration, artwork1, null);
+        updateScreen("Click a button below to see an example of an Alert", null, null, null, "AlertScreen", softButtonObjectList, templateConfiguration, artwork1, null);
 
     }
 
@@ -690,10 +691,12 @@ public class SdlService extends Service {
     private void setScrollableMessage() {
         // Create Message To Display
         String scrollableMessageText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare. Purus in massa tempor nec feugiat nisl pretium fusce id. Pharetra convallis posuere morbi leo urna molestie at elementum eu. Dictum sit amet justo donec enim.";
-
+        SoftButton softButton1 = new SoftButton(SoftButtonType.SBT_TEXT, 8001);
+        softButton1.setText("Ok");
         // Create ScrollableMessage Object
         ScrollableMessage scrollableMessage = new ScrollableMessage()
                 .setScrollableMessageBody(scrollableMessageText)
+                .setSoftButtons(Collections.singletonList(softButton1))
                 .setTimeout(50000);
 
         // Set cancelId
@@ -762,16 +765,17 @@ public class SdlService extends Service {
         RGBColor background = new RGBColor(238, 109, 173);
         RGBColor dark = new RGBColor(51, 49, 46);
         RGBColor light = new RGBColor(250, 250, 250);
+        RGBColor mediaBar = new RGBColor(238, 109, 77);
 
         TemplateColorScheme templateColorSchemeDay = new TemplateColorScheme();
 
         templateColorSchemeDay.setBackgroundColor(background);
-        templateColorSchemeDay.setPrimaryColor(light);
+        templateColorSchemeDay.setPrimaryColor(mediaBar);
         templateColorSchemeDay.setSecondaryColor(light);
         TemplateColorScheme templateColorSchemeNight = new TemplateColorScheme();
 
         templateColorSchemeNight.setBackgroundColor(background);
-        templateColorSchemeNight.setPrimaryColor(dark);
+        templateColorSchemeNight.setPrimaryColor(mediaBar);
         templateColorSchemeNight.setSecondaryColor(dark);
 
         TemplateConfiguration templateConfiguration = new TemplateConfiguration();
@@ -840,7 +844,6 @@ public class SdlService extends Service {
             @Override
             public void onUserDidSubmitInput(String inputText, KeyboardEvent event) {
                 keyboardScreen(inputText);
-                DebugTool.logInfo("Julian", " " + inputText);
             }
 
             @Override
