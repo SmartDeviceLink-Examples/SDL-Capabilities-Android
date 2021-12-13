@@ -65,6 +65,7 @@ import com.smartdevicelink.transport.TCPTransportConfig;
 import com.smartdevicelink.util.DebugTool;
 import com.smartdevicelink.util.SystemInfo;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,6 +82,7 @@ public class SdlService extends Service {
     OnButtonListener onButtonListener;
     SetMediaClockTimer mediaClock;
     boolean isMediaPaused;
+    boolean onButtonListDeployed = false;
 
     private SdlManager sdlManager = null;
     private static final int FOREGROUND_SERVICE_ID = 111;
@@ -533,7 +535,7 @@ public class SdlService extends Service {
                     @Override
                     public void onNotified(RPCNotification notification) {
                         OnButtonPress onButtonPress = (OnButtonPress) notification;
-                        if (onButtonPress.getCustomButtonID() == softButtonId) {
+                        if (onButtonPress.getButtonName() == ButtonName.CUSTOM_BUTTON && onButtonPress.getCustomButtonID()  == softButtonId) {
                             sdlManager.getScreenManager().setTextField2("The Ok button was pressed");
                         }
                     }
@@ -759,7 +761,7 @@ public class SdlService extends Service {
 
     private void setBops() {
         isMediaPaused = false;
-        mediaClock = new SetMediaClockTimer().countUpFromStartTimeInterval(0, 253, AudioStreamingIndicator.PAUSE);
+        mediaClock = new SetMediaClockTimer().countUpFromStartTimeInterval(0, 800, AudioStreamingIndicator.PAUSE);
         sdlManager.sendRPC(mediaClock);
 
         RGBColor background = new RGBColor(250, 250, 250);
@@ -788,38 +790,46 @@ public class SdlService extends Service {
         updateScreen("Only the best music, everywhere.", null, null, null, "BOPS", null, templateConfiguration, bopsMain, null);
         updateMenu(true);
 
-        onButtonListener = new OnButtonListener() {
-            @Override
-            public void onPress(ButtonName buttonName, OnButtonPress buttonPress) {
-                if(buttonName == ButtonName.PLAY_PAUSE) {
-                    if (isMediaPaused){
-                        mediaClock = new SetMediaClockTimer().resumeWithPlayPauseIndicator(AudioStreamingIndicator.PAUSE);
-                        isMediaPaused = false;
-                    } else {
-                        mediaClock = new SetMediaClockTimer().pauseWithPlayPauseIndicator(AudioStreamingIndicator.PLAY);
-                        isMediaPaused = true;
-                    }
-                }
-                sdlManager.sendRPC(mediaClock);
-            }
-
-            @Override
-            public void onEvent(ButtonName buttonName, OnButtonEvent buttonEvent) {
-
-            }
-
-            @Override
-            public void onError(String info) {
-
-            }
-        };
     }
 
     private void subscribeToMediaButtons() {
-        ButtonName[] buttonNames = {ButtonName.PLAY_PAUSE, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT};
-        for (ButtonName buttonName : buttonNames) {
-            sdlManager.getScreenManager().addButtonListener(buttonName, onButtonListener);
+        if (onButtonListDeployed == false) {
+            onButtonListener = new OnButtonListener() {
+                @Override
+                public void onPress(ButtonName buttonName, OnButtonPress buttonPress) {
+                    if (buttonName == ButtonName.PLAY_PAUSE) {
+                        if (isMediaPaused) {
+                            mediaClock = new SetMediaClockTimer().resumeWithPlayPauseIndicator(AudioStreamingIndicator.PAUSE);
+                            isMediaPaused = false;
+                        } else {
+                            mediaClock = new SetMediaClockTimer().pauseWithPlayPauseIndicator(AudioStreamingIndicator.PLAY);
+                            isMediaPaused = true;
+                        }
+                        sdlManager.sendRPC(mediaClock);
+                    } else if (buttonName == ButtonName.SEEKRIGHT || buttonName == ButtonName.SEEKLEFT) {
+                        isMediaPaused = false;
+                        mediaClock = new SetMediaClockTimer().countUpFromStartTimeInterval(0, 800, AudioStreamingIndicator.PAUSE);
+                        sdlManager.sendRPC(mediaClock);
+                    }
+                }
+
+                @Override
+                public void onEvent(ButtonName buttonName, OnButtonEvent buttonEvent) {
+
+                }
+
+                @Override
+                public void onError(String info) {
+
+                }
+            };
+
+            ButtonName[] buttonNames = {ButtonName.PLAY_PAUSE, ButtonName.SEEKLEFT, ButtonName.SEEKRIGHT};
+            for (ButtonName buttonName : buttonNames) {
+                sdlManager.getScreenManager().addButtonListener(buttonName, onButtonListener);
+            }
         }
+        onButtonListDeployed = true;
     }
 
     private void keyboardScreen(String inputText) {
