@@ -398,7 +398,7 @@ public class SdlService extends Service {
 
     private void setMainScreenTextFields() {
         TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.GRAPHIC_WITH_TEXT.toString());
-        updateScreen("1. There are up to four available text fields ", "2. That can be displayed on screen,", "3. Depending on the screen layout selected", "4. Text field 4", "Title Field", null, templateConfiguration, null, null);
+        updateScreen("1. There are up to four available text fields ", "2. That can be displayed on screen,", "3. Depending on the screen layout selected", "4. Text field 4", "Title Field", null, templateConfiguration, artwork1, null);
         updateMenu(true);
     }
 
