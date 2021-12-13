@@ -173,7 +173,7 @@ public class SdlService extends Service {
             };
 
             // Create App Icon, this is set in the SdlManager builder
-            SdlArtwork appIcon = new SdlArtwork("appIcon", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, true);
+            SdlArtwork appIcon = new SdlArtwork("appIcon.png", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, true);
             LockScreenConfig lockScreenConfig = new LockScreenConfig();
             lockScreenConfig.setDisplayMode(LockScreenConfig.DISPLAY_MODE_ALWAYS);
             lockScreenConfig.enableDismissGesture(false);
@@ -190,8 +190,8 @@ public class SdlService extends Service {
 
         return START_STICKY;
     }
-    SdlArtwork artwork1 = new SdlArtwork("appIcon2", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, false);
-    SdlArtwork artwork2 = new SdlArtwork("appIcon3", FileType.GRAPHIC_PNG, R.drawable.sdl_lockscreen_icon, false);
+    SdlArtwork artwork1 = new SdlArtwork("appIcon2.png", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, false);
+    SdlArtwork artwork2 = new SdlArtwork("appIcon3.png", FileType.GRAPHIC_PNG, R.drawable.sdl_lockscreen_icon, false);
 
     private void setMainScreen () {
         TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.TEXT_WITH_GRAPHIC.toString());
@@ -203,7 +203,7 @@ public class SdlService extends Service {
     private void setMenu () {
 
         // some arts
-        SdlArtwork livio = new SdlArtwork("livio", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, false);
+        SdlArtwork livio = new SdlArtwork("livio.png", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, false);
 
         // some voice commands
         List<String> voice2 = Collections.singletonList("Cell two");
@@ -286,8 +286,8 @@ public class SdlService extends Service {
 
         });
 
-        SdlArtwork carGoLogo = new SdlArtwork("carGoLogo", FileType.GRAPHIC_PNG, R.drawable.cargo_logo, false);
-        SdlArtwork carGoAppIcon = new SdlArtwork("carGoAppIcon", FileType.GRAPHIC_PNG, R.drawable.cargo_app_icon, false);
+        SdlArtwork carGoLogo = new SdlArtwork("carGoLogo.png", FileType.GRAPHIC_PNG, R.drawable.cargo_logo, false);
+        SdlArtwork carGoAppIcon = new SdlArtwork("carGoAppIcon.png", FileType.GRAPHIC_PNG, R.drawable.cargo_app_icon, false);
 
         MenuCell sub10Cell1 = new MenuCell("CarGo", null, null, carGoAppIcon, carGoLogo, null, new MenuSelectionListener() {
             @Override
@@ -297,8 +297,8 @@ public class SdlService extends Service {
             }
         });
 
-        SdlArtwork bopsLogo = new SdlArtwork("bopsLogo", FileType.GRAPHIC_PNG, R.drawable.bops_logo, false);
-        SdlArtwork bopsAppIcon = new SdlArtwork("bopsAppIcon", FileType.GRAPHIC_PNG, R.drawable.bops_app_icon, false);
+        SdlArtwork bopsLogo = new SdlArtwork("bopsLogo.png", FileType.GRAPHIC_PNG, R.drawable.bops_logo, false);
+        SdlArtwork bopsAppIcon = new SdlArtwork("bopsAppIcon.png", FileType.GRAPHIC_PNG, R.drawable.bops_app_icon, false);
 
         MenuCell sub10Cell2 = new MenuCell("BOPS", null, null, bopsAppIcon, bopsLogo, null, new MenuSelectionListener() {
             @Override
@@ -306,8 +306,8 @@ public class SdlService extends Service {
                 setBops();
             }
         });
-        SdlArtwork rydeLogo = new SdlArtwork("rydeLogo", FileType.GRAPHIC_PNG, R.drawable.ryde_logo, false);
-        SdlArtwork rydeAppIcon = new SdlArtwork("rydeAppIcon", FileType.GRAPHIC_PNG, R.drawable.ryde_app_icon, false);
+        SdlArtwork rydeLogo = new SdlArtwork("rydeLogo.png", FileType.GRAPHIC_PNG, R.drawable.ryde_logo, false);
+        SdlArtwork rydeAppIcon = new SdlArtwork("rydeAppIcon.png", FileType.GRAPHIC_PNG, R.drawable.ryde_app_icon, false);
 
         MenuCell sub10Cell3 = new MenuCell("Ryde", null, null, rydeAppIcon, rydeLogo, null, new MenuSelectionListener() {
             @Override
@@ -315,7 +315,7 @@ public class SdlService extends Service {
                 setRyde();
             }
         });
-        mainCell10 = new MenuCell("Color Scheme Branding Examples", null, null, MenuLayout.LIST, livio, null, Arrays.asList(sub10Cell1, sub10Cell2, sub10Cell3));
+        mainCell10 = new MenuCell("Color Scheme Branding Examples", null, null, MenuLayout.TILES, livio, null, Arrays.asList(sub10Cell1, sub10Cell2, sub10Cell3));
 
 
         updateMenu(false);
@@ -398,7 +398,7 @@ public class SdlService extends Service {
 
     private void setMainScreenTextFields() {
         TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.GRAPHIC_WITH_TEXT.toString());
-        updateScreen("1. There are up to four available text fields ", "2. That can be displayed on screen,", "3. Depending on the screen layout selected", "4. Text field 4", "Title Field", null, templateConfiguration, artwork2, null);
+        updateScreen("1. There are up to four available text fields ", "2. That can be displayed on screen,", "3. Depending on the screen layout selected", "4. Text field 4", "Title Field", null, templateConfiguration, null, null);
         updateMenu(true);
     }
 
@@ -567,10 +567,8 @@ public class SdlService extends Service {
                 sdlManager.getScreenManager().setTextField2(textField2);
                 sdlManager.getScreenManager().setTextField3(textField3);
                 sdlManager.getScreenManager().setTextField4(textField4);
-                if (primaryGraphic != null) {
-                    sdlManager.getScreenManager().setPrimaryGraphic(primaryGraphic);
-                    sdlManager.getScreenManager().setSecondaryGraphic(secondaryGraphic);
-                }
+                sdlManager.getScreenManager().setPrimaryGraphic(primaryGraphic);
+                sdlManager.getScreenManager().setSecondaryGraphic(secondaryGraphic);
                 sdlManager.getScreenManager().setTitle(titleField);
                 List<SoftButtonObject> updateList = softButtonObjectList != null ? softButtonObjectList : Collections.EMPTY_LIST;
                 sdlManager.getScreenManager().setSoftButtonObjects(updateList);
@@ -709,6 +707,7 @@ public class SdlService extends Service {
 
     private void setCarGo() {
         RGBColor background = new RGBColor(140, 228, 242);
+        RGBColor backgroundDark = new RGBColor(39, 38, 53);
         RGBColor dark = new RGBColor(39, 38, 53);
         RGBColor light = new RGBColor(232, 233, 243);
 
@@ -719,21 +718,22 @@ public class SdlService extends Service {
         templateColorSchemeDay.setSecondaryColor(light);
         TemplateColorScheme templateColorSchemeNight = new TemplateColorScheme();
 
-        templateColorSchemeNight.setBackgroundColor(background);
+        templateColorSchemeNight.setBackgroundColor(backgroundDark);
         templateColorSchemeNight.setPrimaryColor(dark);
         templateColorSchemeNight.setSecondaryColor(dark);
         TemplateConfiguration templateConfiguration = new TemplateConfiguration();
-        templateConfiguration.setTemplate(PredefinedLayout.TEXT_AND_SOFTBUTTONS_WITH_GRAPHIC.toString());
+        templateConfiguration.setTemplate(PredefinedLayout.GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS.toString());
         templateConfiguration.setDayColorScheme(templateColorSchemeDay);
         templateConfiguration.setNightColorScheme(templateColorSchemeNight);
-        SdlArtwork carGoMain = new SdlArtwork("carGoMain", FileType.GRAPHIC_PNG, R.drawable.cargo_main, false);
+        SdlArtwork carGoMain = new SdlArtwork("carGoMain.png", FileType.GRAPHIC_PNG, R.drawable.cargo_main, false);
 
-        updateScreen("CarGo", null, null, null, "CarGo", null, templateConfiguration, carGoMain, null);
+        updateScreen("Goods delivered.", null, null, null, "CarGo", null, templateConfiguration, carGoMain, null);
         updateMenu(true);
     }
 
     private void setRyde() {
         RGBColor background = new RGBColor(164, 247, 181);
+        RGBColor backgroundDark = new RGBColor(69, 88, 167);
         RGBColor dark = new RGBColor(69, 88, 167);
         RGBColor light = new RGBColor(242, 241, 239);
 
@@ -744,16 +744,16 @@ public class SdlService extends Service {
         templateColorSchemeDay.setSecondaryColor(light);
         TemplateColorScheme templateColorSchemeNight = new TemplateColorScheme();
 
-        templateColorSchemeNight.setBackgroundColor(background);
+        templateColorSchemeNight.setBackgroundColor(backgroundDark);
         templateColorSchemeNight.setPrimaryColor(dark);
         templateColorSchemeNight.setSecondaryColor(dark);
         TemplateConfiguration templateConfiguration = new TemplateConfiguration();
-        templateConfiguration.setTemplate(PredefinedLayout.GRAPHIC_WITH_TEXT_AND_SOFTBUTTONS.toString());
+        templateConfiguration.setTemplate(PredefinedLayout.TEXT_AND_SOFTBUTTONS_WITH_GRAPHIC.toString());
         templateConfiguration.setDayColorScheme(templateColorSchemeDay);
         templateConfiguration.setNightColorScheme(templateColorSchemeNight);
-        SdlArtwork rydeMain = new SdlArtwork("rydeMain", FileType.GRAPHIC_PNG, R.drawable.ryde_main, false);
+        SdlArtwork rydeMain = new SdlArtwork("rydeMain.png", FileType.GRAPHIC_PNG, R.drawable.ryde_main, false);
 
-        updateScreen("Ryde", null, null, null, "Ryde", null, templateConfiguration, rydeMain, null);
+        updateScreen("Get where you need.", null, null, null, "Ryde", null, templateConfiguration, rydeMain, null);
         updateMenu(true);
     }
 
@@ -762,7 +762,8 @@ public class SdlService extends Service {
         mediaClock = new SetMediaClockTimer().countUpFromStartTimeInterval(0, 253, AudioStreamingIndicator.PAUSE);
         sdlManager.sendRPC(mediaClock);
 
-        RGBColor background = new RGBColor(238, 109, 173);
+        RGBColor background = new RGBColor(250, 250, 250);
+        RGBColor backgroundDark = new RGBColor(30, 28, 25);
         RGBColor dark = new RGBColor(51, 49, 46);
         RGBColor light = new RGBColor(250, 250, 250);
         RGBColor mediaBar = new RGBColor(238, 109, 77);
@@ -774,7 +775,7 @@ public class SdlService extends Service {
         templateColorSchemeDay.setSecondaryColor(light);
         TemplateColorScheme templateColorSchemeNight = new TemplateColorScheme();
 
-        templateColorSchemeNight.setBackgroundColor(background);
+        templateColorSchemeNight.setBackgroundColor(backgroundDark);
         templateColorSchemeNight.setPrimaryColor(mediaBar);
         templateColorSchemeNight.setSecondaryColor(dark);
 
@@ -782,9 +783,9 @@ public class SdlService extends Service {
         templateConfiguration.setTemplate(PredefinedLayout.MEDIA.toString());
         templateConfiguration.setDayColorScheme(templateColorSchemeDay);
         templateConfiguration.setNightColorScheme(templateColorSchemeNight);
-        SdlArtwork bopsMain = new SdlArtwork("bopsMain", FileType.GRAPHIC_PNG, R.drawable.bops_main, false);
+        SdlArtwork bopsMain = new SdlArtwork("bopsMain.png", FileType.GRAPHIC_PNG, R.drawable.bops_main, false);
 
-        updateScreen("BOPS", null, null, null, "BOPS", null, templateConfiguration, bopsMain, null);
+        updateScreen("Only the best music, everywhere.", null, null, null, "BOPS", null, templateConfiguration, bopsMain, null);
         updateMenu(true);
 
         onButtonListener = new OnButtonListener() {
@@ -836,7 +837,7 @@ public class SdlService extends Service {
             }
         };
         SoftButtonObject softButtonObject = new SoftButtonObject("keyboard", softButtonState, onEventListener);
-        updateScreen("Keyboard Text: " + inputText, null, null, null, "Keyboard", Collections.singletonList(softButtonObject), templateConfiguration,null,null);
+        updateScreen("Keyboard Text: ", inputText, null, null, "Keyboard", Collections.singletonList(softButtonObject), templateConfiguration,artwork1,null);
         updateMenu(true);
     }
     private void setPopUpKeyboard() {
