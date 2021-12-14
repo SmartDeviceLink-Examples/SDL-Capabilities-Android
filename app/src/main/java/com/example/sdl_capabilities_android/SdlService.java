@@ -18,6 +18,7 @@ import com.smartdevicelink.managers.SdlManagerListener;
 import com.smartdevicelink.managers.file.filetypes.SdlArtwork;
 import com.smartdevicelink.managers.lifecycle.LifecycleConfigurationUpdate;
 import com.smartdevicelink.managers.lockscreen.LockScreenConfig;
+import com.smartdevicelink.managers.screen.AlertAudioData;
 import com.smartdevicelink.managers.screen.AlertView;
 import com.smartdevicelink.managers.screen.OnButtonListener;
 import com.smartdevicelink.managers.screen.SoftButtonObject;
@@ -175,7 +176,7 @@ public class SdlService extends Service {
             };
 
             // Create App Icon, this is set in the SdlManager builder
-            SdlArtwork appIcon = new SdlArtwork("appIcon.png", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, true);
+            SdlArtwork appIcon = new SdlArtwork("mainIcon.png", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, true);
             LockScreenConfig lockScreenConfig = new LockScreenConfig();
             lockScreenConfig.setDisplayMode(LockScreenConfig.DISPLAY_MODE_ALWAYS);
             lockScreenConfig.enableDismissGesture(false);
@@ -411,10 +412,12 @@ public class SdlService extends Service {
     }
 
     private void setAlert() {
-        SoftButtonState softButtonState = new SoftButtonState("State1", "Alert ", null);
-        SoftButtonState softButtonState2 = new SoftButtonState("State2", "Alert with Buttons", null);
-        SoftButtonState softButtonState3 = new SoftButtonState("State3", "Subtle Alert", null);
-        SoftButtonState softButtonState4 = new SoftButtonState("State4", "Subtle Alert with Buttons", null);
+        SoftButtonState softButtonState = new SoftButtonState("State1", "Alert 1 ", null);
+        SoftButtonState softButtonState2 = new SoftButtonState("State2", "Alert 2", null);
+        SoftButtonState softButtonState3 = new SoftButtonState("State3", "Subtle Alert 1", null);
+        SoftButtonState softButtonState4 = new SoftButtonState("State4", "Subtle Alert 2", null);
+        AlertAudioData alertAudioData = new AlertAudioData("Alerts can have audio");
+        alertAudioData.setPlayTone(true);
 
         SoftButtonObject softButtonObject = new SoftButtonObject("Button1", softButtonState, new SoftButtonObject.OnEventListener() {
             @Override
@@ -424,6 +427,7 @@ public class SdlService extends Service {
                 alertBuilder.setText("Alert TextField 1");
                 alertBuilder.setSecondaryText("Alert TextField 2");
                 alertBuilder.setTertiaryText("Alert TextField 3");
+                alertBuilder.setAudio(alertAudioData);
                 AlertView alertView = alertBuilder.build();
                 sdlManager.getScreenManager().presentAlert(alertView, new AlertCompletionListener() {
                     @Override
@@ -569,8 +573,10 @@ public class SdlService extends Service {
                 sdlManager.getScreenManager().setTextField2(textField2);
                 sdlManager.getScreenManager().setTextField3(textField3);
                 sdlManager.getScreenManager().setTextField4(textField4);
-                sdlManager.getScreenManager().setPrimaryGraphic(primaryGraphic);
-                sdlManager.getScreenManager().setSecondaryGraphic(secondaryGraphic);
+                SdlArtwork artworkToUpload = primaryGraphic != null ? primaryGraphic : new SdlArtwork("blankArtwork.png", FileType.GRAPHIC_PNG, R.drawable.transparent, true);
+                SdlArtwork artworkToUpload2 = secondaryGraphic != null ? secondaryGraphic : new SdlArtwork("blankArtwork.png", FileType.GRAPHIC_PNG, R.drawable.transparent, true);
+                sdlManager.getScreenManager().setPrimaryGraphic(artworkToUpload);
+                sdlManager.getScreenManager().setSecondaryGraphic(artworkToUpload2);
                 sdlManager.getScreenManager().setTitle(titleField);
                 List<SoftButtonObject> updateList = softButtonObjectList != null ? softButtonObjectList : Collections.EMPTY_LIST;
                 sdlManager.getScreenManager().setSoftButtonObjects(updateList);
@@ -729,7 +735,7 @@ public class SdlService extends Service {
         templateConfiguration.setNightColorScheme(templateColorSchemeNight);
         SdlArtwork carGoMain = new SdlArtwork("carGoMain.png", FileType.GRAPHIC_PNG, R.drawable.cargo_main, false);
 
-        updateScreen("Goods delivered.", null, null, null, "CarGo", null, templateConfiguration, carGoMain, null);
+        updateScreen("Goods delivered", "Wherever you need", null, null, "CarGo", null, templateConfiguration, carGoMain, null);
         updateMenu(true);
     }
 
@@ -755,7 +761,7 @@ public class SdlService extends Service {
         templateConfiguration.setNightColorScheme(templateColorSchemeNight);
         SdlArtwork rydeMain = new SdlArtwork("rydeMain.png", FileType.GRAPHIC_PNG, R.drawable.ryde_main, false);
 
-        updateScreen("Get where you need.", null, null, null, "Ryde", null, templateConfiguration, rydeMain, null);
+        updateScreen("Get where you need", null, null, null, "Ryde", null, templateConfiguration, rydeMain, null);
         updateMenu(true);
     }
 
@@ -787,7 +793,7 @@ public class SdlService extends Service {
         templateConfiguration.setNightColorScheme(templateColorSchemeNight);
         SdlArtwork bopsMain = new SdlArtwork("bopsMain.png", FileType.GRAPHIC_PNG, R.drawable.bops_main, false);
 
-        updateScreen("Only the best music, everywhere.", null, null, null, "BOPS", null, templateConfiguration, bopsMain, null);
+        updateScreen("Only the best music, everywhere", null, null, null, "BOPS", null, templateConfiguration, bopsMain, null);
         updateMenu(true);
 
     }
