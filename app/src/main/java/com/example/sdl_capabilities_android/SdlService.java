@@ -374,7 +374,7 @@ public class SdlService extends Service {
             }
         };
         SoftButtonObject softButtonObject = new SoftButtonObject("SliderButton", softButtonState, onEventListener);
-        updateScreen("Slider position: " + sliderPosition, null, null, null, "Slider", Collections.singletonList(softButtonObject), templateConfiguration,null,null);
+        updateScreen("Slider position: " + sliderPosition, null, null, null, "Slider", Collections.singletonList(softButtonObject), templateConfiguration,artwork1,null);
         updateMenu(true);
     }
 
