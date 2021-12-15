@@ -194,7 +194,7 @@ public class SdlService extends Service {
         return START_STICKY;
     }
     SdlArtwork artwork1 = new SdlArtwork("appIcon2.png", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, false);
-    SdlArtwork artwork2 = new SdlArtwork("appIcon3.png", FileType.GRAPHIC_PNG, R.drawable.sdl_lockscreen_icon, false);
+    SdlArtwork artwork2 = new SdlArtwork("appIcon3.png", FileType.GRAPHIC_PNG, R.mipmap.icon_blanco, false);
 
     private void setMainScreen () {
         TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.TEXT_WITH_GRAPHIC.toString());
