@@ -9,6 +9,6 @@ import java.util.List;
 
 public class Config {
     // TCP specific configs
-    public static String CORE_IP = "192.168.1.239";
+    public static String CORE_IP = "127.0.0.1";
     public static int CORE_PORT = 12345;
 }
