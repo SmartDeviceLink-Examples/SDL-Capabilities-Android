@@ -416,8 +416,6 @@ public class SdlService extends Service {
         SoftButtonState softButtonState2 = new SoftButtonState("State2", "Alert 2", null);
         SoftButtonState softButtonState3 = new SoftButtonState("State3", "Subtle Alert 1", null);
         SoftButtonState softButtonState4 = new SoftButtonState("State4", "Subtle Alert 2", null);
-        AlertAudioData alertAudioData = new AlertAudioData("Alerts can have audio");
-        alertAudioData.setPlayTone(true);
 
         SoftButtonObject softButtonObject = new SoftButtonObject("Button1", softButtonState, new SoftButtonObject.OnEventListener() {
             @Override
@@ -427,7 +425,6 @@ public class SdlService extends Service {
                 alertBuilder.setText("Alert TextField 1");
                 alertBuilder.setSecondaryText("Alert TextField 2");
                 alertBuilder.setTertiaryText("Alert TextField 3");
-                alertBuilder.setAudio(alertAudioData);
                 AlertView alertView = alertBuilder.build();
                 sdlManager.getScreenManager().presentAlert(alertView, new AlertCompletionListener() {
                     @Override
