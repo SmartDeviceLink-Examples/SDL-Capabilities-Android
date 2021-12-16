@@ -193,8 +193,8 @@ public class SdlService extends Service {
 
         return START_STICKY;
     }
-    SdlArtwork artwork1 = new SdlArtwork("appIcon2.png", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, false);
-    SdlArtwork artwork2 = new SdlArtwork("appIcon3.png", FileType.GRAPHIC_PNG, R.mipmap.icon_blanco, false);
+    SdlArtwork artwork1 = new SdlArtwork("appIcon2.png", FileType.GRAPHIC_PNG, R.drawable.sdl_logo_, false);
+    SdlArtwork artwork2 = new SdlArtwork("appIcon3.png", FileType.GRAPHIC_PNG, R.drawable.blanco_grande, false);
 
     private void setMainScreen () {
         TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.TEXT_WITH_GRAPHIC.toString());
@@ -206,7 +206,7 @@ public class SdlService extends Service {
     private void setMenu () {
 
         // some arts
-        SdlArtwork livio = new SdlArtwork("livio.png", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, false);
+        SdlArtwork livio = new SdlArtwork("livio.png", FileType.GRAPHIC_PNG, R.drawable.sdl_logo_, false);
 
         // some voice commands
         List<String> voice2 = Collections.singletonList("Cell two");
