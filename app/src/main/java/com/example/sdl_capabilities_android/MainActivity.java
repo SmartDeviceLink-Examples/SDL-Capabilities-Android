@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.smartdevicelink.transport.SdlBroadcastReceiver;
 import com.smartdevicelink.util.DebugTool;
 
 public class MainActivity extends AppCompatActivity {
@@ -18,8 +19,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         DebugTool.enableDebugTool();
-        Intent intent = new Intent(this, ConfigActivity.class);
-        startActivityForResult(intent, CONFIGS_ACTIVITY_REQUEST_CODE);
+        //Intent intent = new Intent(this, ConfigActivity.class);
+        //startActivityForResult(intent, CONFIGS_ACTIVITY_REQUEST_CODE);
+        SdlBroadcastReceiver.queryForConnectedService(this);
     }
 
     @Override

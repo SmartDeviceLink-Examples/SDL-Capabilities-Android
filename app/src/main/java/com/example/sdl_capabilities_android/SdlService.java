@@ -62,6 +62,7 @@ import com.smartdevicelink.proxy.rpc.enums.StaticIconName;
 import com.smartdevicelink.proxy.rpc.enums.TriggerSource;
 import com.smartdevicelink.proxy.rpc.listeners.OnRPCNotificationListener;
 import com.smartdevicelink.proxy.rpc.listeners.OnRPCResponseListener;
+import com.smartdevicelink.transport.MultiplexTransportConfig;
 import com.smartdevicelink.transport.TCPTransportConfig;
 import com.smartdevicelink.util.DebugTool;
 import com.smartdevicelink.util.SystemInfo;
@@ -127,8 +128,10 @@ public class SdlService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         if (sdlManager == null) {
-            //MultiplexTransportConfig transport = new MultiplexTransportConfig(this, APP_ID, MultiplexTransportConfig.FLAG_MULTI_SECURITY_OFF);
-            TCPTransportConfig transport = new TCPTransportConfig(Config.CORE_PORT, Config.CORE_IP, false);
+            MultiplexTransportConfig transport = new MultiplexTransportConfig(this, APP_ID, MultiplexTransportConfig.FLAG_MULTI_SECURITY_OFF);
+            transport.setRequiresAudioSupport(false);
+            transport.setRequiresHighBandwidth(false);
+            //TCPTransportConfig transport = new TCPTransportConfig(Config.CORE_PORT, Config.CORE_IP, false);
 
             // The app type to be used
             Vector<AppHMIType> appType = new Vector<>();
