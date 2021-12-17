@@ -761,7 +761,7 @@ public class SdlService extends Service {
         templateConfiguration.setNightColorScheme(templateColorSchemeNight);
         SdlArtwork rydeMain = new SdlArtwork("rydeMain.png", FileType.GRAPHIC_PNG, R.drawable.ryde_main, false);
 
-        updateScreen("Get where you need", null, null, null, "Ryde", null, templateConfiguration, rydeMain, null);
+        updateScreen("Get where you need", null, null, null, null, null, templateConfiguration, rydeMain, null);
         updateMenu(true);
     }
 
