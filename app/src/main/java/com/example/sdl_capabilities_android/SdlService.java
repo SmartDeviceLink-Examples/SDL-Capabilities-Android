@@ -78,8 +78,6 @@ public class SdlService extends Service {
 
     private static final String APP_NAME = "SDL";
     private static final String APP_ID = "112233445566";
-    private static final int TCP_PORT = 12345;
-    private static final String DEV_MACHINE_IP_ADDRESS = "10.0.0.86";
     OnButtonListener onButtonListener;
     SetMediaClockTimer mediaClock;
     boolean isMediaPaused;
