@@ -62,6 +62,7 @@ import com.smartdevicelink.proxy.rpc.enums.StaticIconName;
 import com.smartdevicelink.proxy.rpc.enums.TriggerSource;
 import com.smartdevicelink.proxy.rpc.listeners.OnRPCNotificationListener;
 import com.smartdevicelink.proxy.rpc.listeners.OnRPCResponseListener;
+import com.smartdevicelink.transport.MultiplexTransportConfig;
 import com.smartdevicelink.transport.TCPTransportConfig;
 import com.smartdevicelink.util.DebugTool;
 import com.smartdevicelink.util.SystemInfo;
@@ -125,8 +126,10 @@ public class SdlService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         if (sdlManager == null) {
-            //MultiplexTransportConfig transport = new MultiplexTransportConfig(this, APP_ID, MultiplexTransportConfig.FLAG_MULTI_SECURITY_OFF);
-            TCPTransportConfig transport = new TCPTransportConfig(Config.CORE_PORT, Config.CORE_IP, false);
+            MultiplexTransportConfig transport = new MultiplexTransportConfig(this, APP_ID, MultiplexTransportConfig.FLAG_MULTI_SECURITY_OFF);
+            transport.setRequiresAudioSupport(false);
+            transport.setRequiresHighBandwidth(false);
+            //TCPTransportConfig transport = new TCPTransportConfig(Config.CORE_PORT, Config.CORE_IP, false);
 
             // The app type to be used
             Vector<AppHMIType> appType = new Vector<>();
@@ -191,8 +194,8 @@ public class SdlService extends Service {
 
         return START_STICKY;
     }
-    SdlArtwork artwork1 = new SdlArtwork("appIcon2.png", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, false);
-    SdlArtwork artwork2 = new SdlArtwork("appIcon3.png", FileType.GRAPHIC_PNG, R.mipmap.icon_blanco, false);
+    SdlArtwork artwork1 = new SdlArtwork("appIcon2.png", FileType.GRAPHIC_PNG, R.drawable.sdl_logo_, false);
+    SdlArtwork artwork2 = new SdlArtwork("appIcon3.png", FileType.GRAPHIC_PNG, R.drawable.blanco_grande, false);
 
     private void setMainScreen () {
         TemplateConfiguration templateConfiguration = new TemplateConfiguration().setTemplate(PredefinedLayout.TEXT_WITH_GRAPHIC.toString());
@@ -204,7 +207,7 @@ public class SdlService extends Service {
     private void setMenu () {
 
         // some arts
-        SdlArtwork livio = new SdlArtwork("livio.png", FileType.GRAPHIC_PNG, R.drawable.ic_sdl, false);
+        SdlArtwork livio = new SdlArtwork("livio.png", FileType.GRAPHIC_PNG, R.drawable.sdl_logo_, false);
 
         // some voice commands
         List<String> voice2 = Collections.singletonList("Cell two");
